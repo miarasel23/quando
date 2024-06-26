@@ -77,7 +77,14 @@ class AdminController extends Controller
                     'status' => true,
                     'message' => 'Logout Successfully',
                 ], 200);
+            }else{
+                return response()->json([
+                    'status' => false,
+                    'message' => 'User Not Found',
+                ], 404);
             }
+
+
         }catch(Throwable $e){
             return response()->json([
                 'status' => false,
@@ -128,7 +135,7 @@ class AdminController extends Controller
         ]);
         return response()->json([
             'status' => true,
-            'message' => 'Restaurent Created Successfully',
+            'message' => 'Restaurant Created Successfully',
             'data' => $restaurent
         ], 200);
 
