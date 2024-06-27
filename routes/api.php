@@ -53,10 +53,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
 
 
-            Route::post('table-create', [RestaurentController::class, 'table_create']);
-            Route::post('table-update', [RestaurentController::class, 'table_update']);
-            Route::get('table-info/{rest_uuid}', [RestaurentController::class, 'table_info']);
-            Route::get('table-delete/{uuid}', [RestaurentController::class, 'table_delete']);
+            Route::post('table-create', [RestaurantController::class, 'table_create']);
+            Route::post('table-update', [RestaurantController::class, 'table_update']);
+            Route::get('table-info/{rest_uuid}', [RestaurantController::class, 'table_info']);
+            Route::get('table-delete/{uuid}', [RestaurantController::class, 'table_delete']);
         });
 
 
