@@ -24,10 +24,18 @@ class Restaurent extends Model
         'status',
     ];
 
+    public function category_list(){
+
+        return $this->belongsTo(Category::class,'category','id');
+    }
+
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults();
     }
+
+
 
     protected static function boot()
     {

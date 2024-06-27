@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 use App\Models\Restaurent;
+use App\Models\Category;
 use Auth;
 use Laravel\Sanctum\PersonalAccessToken;
 use  Illuminate\Support\Facades\DB;
@@ -130,6 +131,8 @@ class AdminController extends Controller
             'address' => $request['address'],
             'post_code' => $request['post_code'],
             'avatar' => $request['avatar'],
+            'description' => $request['description'],
+            'category' => $request['category'],
             'restaurent_id' => '123',
             'status' => 'active',
         ]);
@@ -173,6 +176,8 @@ class AdminController extends Controller
         $restaurent->name = $request->name;
         $restaurent->email = $request->email;
         $restaurent->phone = $request->phone;
+        $restaurent->description = $request->description;
+        $restaurent->category = $request->category;
         $restaurent->address = $request->address;
         $restaurent->post_code = $request->post_code;
         // Handle the avatar upload
@@ -190,5 +195,76 @@ class AdminController extends Controller
             'data' => $restaurent
         ], 200);
     }
+
+
+    public function restaurent_info($uuid){
+        $user = User::where('uuid', $uuid)->first();
+        if(!empty($user) && $user->user_type == 'super_admin'){
+            $restaurent = Restaurent::orderBy('id', 'desc')->get();
+            if (empty($restaurent)) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Restaurant not found'
+                ], 404);
+            }
+            return response()->json([
+                'status' => true,
+                'data' => $restaurent
+            ], 200);
+
+        }
+        if(!empty($user) && $user->user_type != 'super_admin'){
+            $restaurent = Restaurent::where('uuid',$user->res_uuid)->get();
+            if (empty($restaurent)) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Restaurant not found'
+                ], 404);
+            }
+            return response()->json([
+                'status' => true,
+                'data' => $restaurent
+            ], 200);
+
+        }
+    }
+
+
+
+
+    public function category(){
+        $category = Category::orderBy('id', 'desc')->get();
+        if ($category->count() == 0) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Category not found'
+            ], 404);
+        }
+        return response()->json([
+            'status' => true,
+            'data' => $category
+        ], 200);
+    }
+
+    public function restaurent_list(){
+        $restaurent = Restaurent::orderBy('id', 'desc')->with('category_list')->where('status', 'active')->get();
+
+        // dd($restaurent);
+        if ($restaurent->count() == 0) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Restaurant not found'
+            ], 404);
+        }
+        return response()->json([
+            'status' => true,
+            'data' => $restaurent
+        ], 200);
+    }
+
+
+
+
+
 
 }

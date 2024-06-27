@@ -14,6 +14,8 @@ use App\Http\Controllers\RestaurantController;
 
 Route::prefix('v1/user/')->group(function () {
     Route::post('/login',[AdminController::class,'Login']);
+    Route::get('/restaurant',[AdminController::class,'restaurent_list']);
+    Route::get('/category',[AdminController::class,'category']);
 });
 
 
@@ -30,6 +32,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::prefix('admin')->group(function () {
             Route::post('restaurant-create', [AdminController::class, 'restaurent_create']);
             Route::post('restaurant-update', [AdminController::class, 'restaurent_update']);
+            Route::get('restaurant-info/{uuid}', [AdminController::class, 'restaurent_info']);
+            Route::get('restaurant-delete/{uuid}', [AdminController::class, 'restaurent_delete']);
         });
 
 
