@@ -5,9 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 class TableMaster extends Model
 {
-    use HasFactory;
+    use HasFactory,LogsActivity;
 
 
     protected $fillable = [
@@ -22,6 +24,12 @@ class TableMaster extends Model
         'table_id',
         'status',
     ];
+
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults();
+    }
 
     protected static function boot()
     {
