@@ -22,7 +22,7 @@ return new class extends Migration
             $table->text('avatar')->nullable();
             $table->text('post_code');
             $table->text('description')->nullable();
-            $table->string('caterogy')->nullable();
+            $table->string('category')->nullable();
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->timestamps();
         });

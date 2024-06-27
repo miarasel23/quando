@@ -20,6 +20,8 @@ class Restaurent extends Model
         'phone',
         'email',
         'avatar',
+        'category',
+        'description',
         'post_code',
         'status',
     ];

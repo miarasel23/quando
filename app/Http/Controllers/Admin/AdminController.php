@@ -12,13 +12,13 @@ use App\Models\Category;
 use Auth;
 use Laravel\Sanctum\PersonalAccessToken;
 use  Illuminate\Support\Facades\DB;
-
+use App\Traits\ImageUploadTraits;
 
 
 class AdminController extends Controller
 {
 
-
+    use ImageUploadTraits;
     // ********************************************  LOGIN ***********************************************
      public function Login(Request $request){
         $validateUser = Validator::make($request->all(), [
@@ -117,20 +117,15 @@ class AdminController extends Controller
                 'errors' => $validateUser->errors()
             ], 422);
         }
-        $request = $request->all();
-        if ($request['avatar']) {
-            $image = $request['avatar'];
-            $image_name = time() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('images'), $image_name);
-            $request['avatar'] = $image_name;
-        }
+
+
         $restaurent = Restaurent::create([
             'name' => $request['name'],
             'email' => $request['email'],
             'phone' => $request['phone'],
             'address' => $request['address'],
             'post_code' => $request['post_code'],
-            'avatar' => $request['avatar'],
+            'avatar' => $request->hasFile('avatar') ? $this->verifyAndUpload('avatar',$request['avatar'], null, null) : null,
             'description' => $request['description'],
             'category' => $request['category'],
             'restaurent_id' => '123',
@@ -180,13 +175,9 @@ class AdminController extends Controller
         $restaurent->category = $request->category;
         $restaurent->address = $request->address;
         $restaurent->post_code = $request->post_code;
-        // Handle the avatar upload
-        if ($request['avatar']) {
-            unlink(public_path('images/' . $restaurent->avatar));
-            $image = $request['avatar'];
-            $image_name = time() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('images'), $image_name);
-            $restaurent->avatar = $image_name;
+        // dd($request->avatar);
+        if($request->hasFile('avatar')){
+            $restaurent->avatar =  $this->updateImage('avatar',$request->avatar,  $restaurent->avatar,null, null);
         }
         $restaurent->save();
         return response()->json([
