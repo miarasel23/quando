@@ -128,6 +128,12 @@ class RestaurantController extends Controller
             $old = Slot::where('day', $request->day)->where('restaurant_id', $rest_data->id)->first();
             if(!empty($old)){
                  $old->update([
+                    'history' => null,
+                 ]);
+                 $old->update([
+                    'history' => json_encode($old),
+                 ]);
+                 $old->update([
                     'slot_start' => $request->slot_start,
                     'slot_end' => $request->slot_end,
                     'status' => $request->status,

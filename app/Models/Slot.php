@@ -17,6 +17,7 @@ class Slot extends Model
         'day',
         'slot_start',
         'slot_end',
+        'history',
         'status',
     ];
 

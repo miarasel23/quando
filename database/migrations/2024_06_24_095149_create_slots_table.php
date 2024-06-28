@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('slot_end');
             $table->enum('day', ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday']);
             $table->enum('status', ['active', 'inactive'])->default('active');
+            $table->text('history')->nullable();
             $table->timestamps();
         });
     }

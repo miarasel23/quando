@@ -175,7 +175,6 @@ class AdminController extends Controller
         $restaurent->category = $request->category;
         $restaurent->address = $request->address;
         $restaurent->post_code = $request->post_code;
-        // dd($request->avatar);
         if($request->hasFile('avatar')){
             $restaurent->avatar =  $this->updateImage('avatar',$request->avatar,  $restaurent->avatar,null, null);
         }
