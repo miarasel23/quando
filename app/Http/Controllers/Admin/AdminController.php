@@ -237,9 +237,12 @@ class AdminController extends Controller
     }
 
     public function restaurent_list(){
-        $restaurent = Restaurent::orderBy('id', 'desc')->with('category_list')->where('status', 'active')->get();
 
-        // dd($restaurent);
+
+        // $restaurant = Restaurent::find(1);
+        // $availableSlots = $restaurant->getAvailableSlots('sunday','07/01/2024');
+
+        $restaurent = Restaurent::orderBy('id', 'desc')->with('category_list')->where('status', 'active')->get();
         if ($restaurent->count() == 0) {
             return response()->json([
                 'status' => false,
