@@ -7,18 +7,24 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
-class Reservation extends Model
+class LabelTaq extends Model
 {
-    use HasFactory,LogsActivity;
+    use HasFactory;
 
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults();
-    }
+
+    protected $fillable = [
+        'uuid',
+        'name',
+        'status',
+        'restaurant_id'
+
+    ];
+
+
+
     protected static function boot()
     {
         parent::boot();
-
         static::creating(function ($model) {
             if (empty($model->uuid)) {
                 $model->uuid = (string) Str::uuid();

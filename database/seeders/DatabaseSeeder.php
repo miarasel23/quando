@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Models\Category;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -14,8 +15,26 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
 
+
+
+
+         $cuisines = [
+            'Afghan',
+            'American',
+            'Argentinian',
+            'Asian',
+            'Australian',
+            'Austrian',
+            'Bangladeshi',
+            'Belgian',
+            'Brazilian',
+            'British',
+        ];
+
+        foreach ($cuisines as $cuisine) {
+            Category::create(['name' => $cuisine]);
+        }
         User::factory()->create([
             'name' => 'Super Admin',
             'email' => 'superadmin@gmail.com',

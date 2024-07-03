@@ -11,16 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('slots', function (Blueprint $table) {
+        Schema::create('label_taqs', function (Blueprint $table) {
             $table->id();
             $table->string('uuid')->unique();
             $table->unsignedBigInteger('restaurant_id');
             $table->foreign('restaurant_id')->references('id')->on('restaurents')->onDelete('cascade')->onUpdate('cascade');
-            $table->string('slot_start');
-            $table->string('slot_end');
-            $table->enum('day', ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday']);
+            $table->string('name');
             $table->enum('status', ['active', 'inactive'])->default('active');
-            $table->text('history')->nullable();
             $table->timestamps();
         });
     }
@@ -30,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('slots');
+        Schema::dropIfExists('label_taqs');
     }
 };

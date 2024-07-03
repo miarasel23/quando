@@ -21,6 +21,12 @@ return new class extends Migration
             $table->string('email');
             $table->text('avatar')->nullable();
             $table->text('post_code');
+            $table->text('description')->nullable();
+            $table->string('category')->nullable();
+            $table->string('created_by');
+            $table->string('updated_by')->nullable();
+            $table->string('website')->nullable();
+            $table->string('online_order',['active', 'inactive'])->default('active');
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->timestamps();
         });
