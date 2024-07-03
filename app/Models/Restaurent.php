@@ -23,16 +23,20 @@ class Restaurent extends Model
         'category',
         'description',
         'post_code',
+        'created_by',
+        'website',
+        'updated_by',
+        'online_order',
         'status',
     ];
 
     public function category_list(){
 
-        return $this->belongsTo(Category::class,'category','id');
+        return $this->belongsTo(Category::class,'category','id')->select(['id','name']);
     }
     public function aval_slots(){
 
-        return $this->hasMany(Slot::class,'restaurant_id','id');
+        return $this->hasMany(Slot::class,'restaurant_id','id')->where('status','active')->select(['id','uuid','restaurant_id','day','slot_start', 'slot_end']);
     }
 
     public function slots_booked()
@@ -40,6 +44,14 @@ class Restaurent extends Model
         return $this->hasMany(Reservation::class, 'restaurant_id','id');
     }
 
+
+    public function label_taqs(){
+        return $this->hasMany(LabelTaq::class,'restaurant_id','id')->where('status','active')->select(['id','uuid','name','status','restaurant_id']);
+    }
+
+    public function about_label_taqs(){
+        return $this->hasMany(AboutTaq::class,'restaurant_id','id')->where('status','active')->select(['id','uuid','name','status','restaurant_id']);
+    }
 
 
 

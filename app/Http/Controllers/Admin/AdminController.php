@@ -109,6 +109,8 @@ class AdminController extends Controller
             ],
             'address' => 'required',
             'post_code' => 'required',
+            'created_by' => 'required',
+            'website' => 'nullable|url',
             'avatar' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Validation rules for image
         ]);
         if ($validateUser->fails()) {
@@ -129,6 +131,8 @@ class AdminController extends Controller
             'description' => $request['description'],
             'category' => $request['category'],
             'restaurent_id' => '123',
+            'created_by' => $request['created_by'],
+            'website' => $request['website'],
             'status' => 'active',
         ]);
         return response()->json([
@@ -150,6 +154,8 @@ class AdminController extends Controller
             ],
             'address' => 'required',
             'post_code' => 'required',
+            'updated_by' => 'required',
+            'website' => 'nullable|url',
             'avatar' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Validation rules for image
         ]);
 
@@ -175,6 +181,8 @@ class AdminController extends Controller
         $restaurent->category = $request->category;
         $restaurent->address = $request->address;
         $restaurent->post_code = $request->post_code;
+        $restaurent->website = $request->website;
+        $restaurent->updated_by = $request->updated_by;
         if($request->hasFile('avatar')){
             $restaurent->avatar =  $this->updateImage('avatar',$request->avatar,  $restaurent->avatar,null, null);
         }
@@ -223,7 +231,7 @@ class AdminController extends Controller
 
 
     public function category(){
-        $category = Category::orderBy('id', 'desc')->get();
+        $category = Category::orderBy('id', 'desc')->with('restaurents')->select(['id','name'])->get();
         if ($category->count() == 0) {
             return response()->json([
                 'status' => false,
@@ -236,13 +244,11 @@ class AdminController extends Controller
         ], 200);
     }
 
-    public function restaurent_list(){
-
-
+    public function restaurent_list(Request $request){
         // $restaurant = Restaurent::find(1);
         // $availableSlots = $restaurant->getAvailableSlots('sunday','07/01/2024');
-
-        $restaurent = Restaurent::orderBy('id', 'desc')->with('category_list')->where('status', 'active')->get();
+        $perPage = $request->input('per_page', 10);
+        $restaurent = Restaurent::orderBy('id', 'desc')->with('category_list','aval_slots','label_taqs','about_label_taqs')->where('status', 'active')->select(['id','uuid','restaurent_id','name','address','phone','email','category','description','post_code','status','avatar','website','online_order'])->paginate($perPage);
         if ($restaurent->count() == 0) {
             return response()->json([
                 'status' => false,
@@ -254,10 +260,41 @@ class AdminController extends Controller
             'data' => $restaurent
         ], 200);
     }
-
-
-
-
-
-
+    public function restaurent_search_list(Request $request){
+        $perPage = $request->input('per_page', 10);
+        $name = $request->input('name');
+        $postCode = $request->input('post_code');
+        $query  = Restaurent::orderBy('id', 'desc')->with('category_list','aval_slots','label_taqs','about_label_taqs')->where('status', 'active')->select(['id','uuid','restaurent_id','name','address','phone','email','category','description','post_code','status','avatar','website','online_order']);
+        if ($name) {
+            $query->where('name', 'like', '%' . $name . '%');
+        }
+        if ($postCode) {
+            $query->where('post_code', 'like', '%' . $postCode . '%');
+        }
+        if(!$name && !$postCode){
+            return response()->json([
+                'status' => false,
+                'data' => [],
+                'pagination' => [
+                    'total' => 0,
+                    'per_page' => $perPage,
+                    'current_page' => 1,
+                    'last_page' => 1,
+                    'next_page_url' => null,
+                    'prev_page_url' => null,
+                ]
+            ], 200);
+        }
+        $restaurants = $query->paginate($perPage);
+        if ($restaurants->count() == 0) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Restaurant not found'
+            ], 404);
+        }
+        return response()->json([
+            'status' => true,
+            'data' => $restaurants
+        ], 200);
+    }
 }

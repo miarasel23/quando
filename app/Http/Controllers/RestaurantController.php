@@ -10,6 +10,8 @@ use App\Models\FloorArea;
 use App\Models\Restaurent;
 use App\Models\Slot;
 use App\Models\TableMaster;
+use App\Models\LabelTaq;
+use App\Models\AboutTaq;
 use Auth;
 use Laravel\Sanctum\PersonalAccessToken;
 use  Illuminate\Support\Facades\DB;
@@ -309,6 +311,215 @@ class RestaurantController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'Table Not Found',
+                'data' => []
+            ], 200);
+        }
+    }
+
+
+    public function label_taq_create(Request $request){
+        $validateUser = Validator::make($request->all(), [
+            'rest_uuid' => 'required',
+            'name' => 'required',
+            'status' => 'required',
+        ]);
+        if ($validateUser->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'validation error',
+                'errors' => $validateUser->errors()
+            ], 401);
+        }
+        $rest_data  = Restaurent::where('uuid', $request->rest_uuid)->first();
+        if(!empty($rest_data)){
+            $data=LabelTaq::create([
+                'restaurant_id' => $rest_data->id,
+                'name' => $request->name,
+                'status' => $request->status,
+            ]);
+            return response()->json([
+                'status' => true,
+                'message' => 'label created Successfully',
+                'data' => $data
+            ], 200);
+        }else{
+            return response()->json([
+                'status' => false,
+                'message' => 'Restaurant Not Found',
+                'data' => []
+            ], 200);
+        }
+    }
+
+
+    public function label_taq_update(Request $request){
+        $validateUser = Validator::make($request->all(), [
+            'rest_uuid' => 'required',
+            'uuid' => 'required',
+            'name' => 'required',
+            'status' => 'required',
+        ]);
+        if ($validateUser->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'validation error',
+                'errors' => $validateUser->errors()
+            ], 401);
+        }
+        $rest_data  = Restaurent::where('uuid', $request->rest_uuid)->first();
+        $edit_data = LabelTaq::where('uuid', $request->uuid)->first();
+        if(!empty($edit_data)){
+            $edit_data->update([
+                'restaurant_id' => $rest_data->id,
+                'name' => $request->name,
+                'status' => $request->status,
+            ]);
+            return response()->json([
+                'status' => true,
+                'message' => 'label Updated Successfully',
+                'data' => $edit_data
+            ], 200);
+        }else{
+            return response()->json([
+                'status' => false,
+                'message' => 'Restaurant Not Found',
+                'data' => []
+            ], 200);
+        }
+    }
+
+    public function label_taq_info($rest_uuid){
+        $rest =  Restaurent::where('uuid', $rest_uuid)->first();
+        $data = LabelTaq::where('restaurant_id', $rest->id)->get();
+        return response()->json([
+            'status' => true,
+            'message' => 'label Info',
+            'data' => $data
+        ], 200);
+    }
+
+
+    public function label_taq_delete($uuid){
+        $delete =  LabelTaq::where('uuid', $uuid)->delete();
+        if(!empty($delete)){
+        return response()->json([
+            'status' => true,
+            'message' => 'label Deleted Successfully',
+            'data' => $delete
+        ], 200);
+        }else{
+            return response()->json([
+                'status' => false,
+                'message' => 'label Not Found',
+                'data' => []
+            ], 200);
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+    public function about_taq_create(Request $request){
+        $validateUser = Validator::make($request->all(), [
+            'rest_uuid' => 'required',
+            'name' => 'required',
+            'status' => 'required',
+        ]);
+        if ($validateUser->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'validation error',
+                'errors' => $validateUser->errors()
+            ], 401);
+        }
+        $rest_data  = Restaurent::where('uuid', $request->rest_uuid)->first();
+        if(!empty($rest_data)){
+            $data=AboutTaq::create([
+                'restaurant_id' => $rest_data->id,
+                'name' => $request->name,
+                'status' => $request->status,
+            ]);
+            return response()->json([
+                'status' => true,
+                'message' => 'about taq created Successfully',
+                'data' => $data
+            ], 200);
+        }else{
+            return response()->json([
+                'status' => false,
+                'message' => 'Restaurant Not Found',
+                'data' => []
+            ], 200);
+        }
+    }
+
+
+    public function about_taq_update(Request $request){
+        $validateUser = Validator::make($request->all(), [
+            'rest_uuid' => 'required',
+            'uuid' => 'required',
+            'name' => 'required',
+            'status' => 'required',
+        ]);
+        if ($validateUser->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'validation error',
+                'errors' => $validateUser->errors()
+            ], 401);
+        }
+        $rest_data  = Restaurent::where('uuid', $request->rest_uuid)->first();
+        $edit_data = AboutTaq::where('uuid', $request->uuid)->first();
+        if(!empty($edit_data)){
+            $edit_data->update([
+                'restaurant_id' => $rest_data->id,
+                'name' => $request->name,
+                'status' => $request->status,
+            ]);
+            return response()->json([
+                'status' => true,
+                'message' => 'about label Updated Successfully',
+                'data' => $edit_data
+            ], 200);
+        }else{
+            return response()->json([
+                'status' => false,
+                'message' => 'Restaurant Not Found',
+                'data' => []
+            ], 200);
+        }
+    }
+
+    public function about_taq_info($rest_uuid){
+        $rest =  Restaurent::where('uuid', $rest_uuid)->first();
+        $data = AboutTaq::where('restaurant_id', $rest->id)->get();
+        return response()->json([
+            'status' => true,
+            'message' => ' about label Info',
+            'data' => $data
+        ], 200);
+    }
+
+
+    public function about_taq_delete($uuid){
+        $delete =  AboutTaq::where('uuid', $uuid)->delete();
+        if(!empty($delete)){
+        return response()->json([
+            'status' => true,
+            'message' => ' about label Deleted Successfully',
+            'data' => $delete
+        ], 200);
+        }else{
+            return response()->json([
+                'status' => false,
+                'message' => ' about label Not Found',
                 'data' => []
             ], 200);
         }

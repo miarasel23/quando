@@ -15,6 +15,7 @@ use App\Http\Controllers\RestaurantController;
 Route::prefix('v1/user/')->group(function () {
     Route::post('/login',[AdminController::class,'Login']);
     Route::get('/restaurant',[AdminController::class,'restaurent_list']);
+    Route::get('/search-restaurant',[AdminController::class,'restaurent_search_list']);
     Route::get('/category',[AdminController::class,'category']);
 });
 
@@ -57,6 +58,18 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             Route::post('table-update', [RestaurantController::class, 'table_update']);
             Route::get('table-info/{rest_uuid}', [RestaurantController::class, 'table_info']);
             Route::get('table-delete/{uuid}', [RestaurantController::class, 'table_delete']);
+
+
+            Route::post('label-taq-create', [RestaurantController::class, 'label_taq_create']);
+            Route::post('label-taq-update', [RestaurantController::class, 'label_taq_update']);
+            Route::get('label-taq-info/{rest_uuid}', [RestaurantController::class, 'label_taq_info']);
+            Route::get('label-taq-delete/{uuid}', [RestaurantController::class, 'label_taq_delete']);
+
+            Route::post('about-taq-create', [RestaurantController::class, 'about_taq_create']);
+            Route::post('about-taq-update', [RestaurantController::class, 'about_taq_update']);
+            Route::get('about-taq-info/{rest_uuid}', [RestaurantController::class, 'about_taq_info']);
+            Route::get('about-taq-delete/{uuid}', [RestaurantController::class, 'about_taq_delete']);
+
         });
 
 
