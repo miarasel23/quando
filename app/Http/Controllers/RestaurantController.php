@@ -96,7 +96,7 @@ class RestaurantController extends Controller
         $data = FloorArea::where('restaurant_id', $rest->id)->get();
         return response()->json([
             'status' => true,
-            'message' => 'User Info',
+            'message' => 'Floor Info',
             'data' => $data
         ], 200);
      }
@@ -105,7 +105,7 @@ class RestaurantController extends Controller
         FloorArea::where('uuid', $uuid)->delete();
         return response()->json([
             'status' => true,
-            'message' => 'User Deleted Successfully',
+            'message' => 'Floor Deleted Successfully',
             'data' => []
         ], 200);
      }
@@ -142,7 +142,7 @@ class RestaurantController extends Controller
                  ]);
                 return response()->json([
                     'status' => true,
-                    'message' => 'User Updated Successfully',
+                    'message' => 'Slot Updated Successfully',
                     'data' => $old
                 ], 200);
             }else{
@@ -155,7 +155,7 @@ class RestaurantController extends Controller
                 ]);
                 return response()->json([
                     'status' => true,
-                    'message' => 'User Created Successfully',
+                    'message' => 'Slot Created Successfully',
                     'data' => $data
                 ], 200);
             }
@@ -174,7 +174,7 @@ class RestaurantController extends Controller
         $data = Slot::where('restaurant_id', $rest->id)->where('status','=','active')->get();
         return response()->json([
             'status' => true,
-            'message' => 'User Info',
+            'message' => 'Slot Info',
             'data' => $data
         ], 200);
      }
