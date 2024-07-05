@@ -93,21 +93,46 @@ class RestaurantController extends Controller
 
      public function floor_area_info( $uuid){
         $rest =  Restaurent::where('uuid', $uuid)->first();
-        $data = FloorArea::where('restaurant_id', $rest->id)->get();
-        return response()->json([
-            'status' => true,
-            'message' => 'Floor Info',
-            'data' => $data
-        ], 200);
+        if(!empty($rest)){
+            $data = FloorArea::where('restaurant_id', $rest->id)->get();
+            if(!empty($data)){
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Floor Info',
+                    'data' => $data
+                ]);
+            }else{
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Floor Not Found',
+                    'data' => []
+                ], 200);
+            }
+        }else{
+            return response()->json([
+                'status' => false,
+                'message' => 'Restaurant Not Found',
+                'data' => []
+            ], 200);
+        }
+
      }
 
      public function floor_area_delete($uuid){
-        FloorArea::where('uuid', $uuid)->delete();
-        return response()->json([
-            'status' => true,
-            'message' => 'Floor Deleted Successfully',
-            'data' => []
-        ], 200);
+        $data=FloorArea::where('uuid', $uuid)->delete();
+        if(!empty($data)){
+            return response()->json([
+                'status' => true,
+                'message' => 'Floor Deleted Successfully',
+                'data' => [],
+            ], 200);
+        }else{
+            return response()->json([
+                'status' => false,
+                'message' => 'Floor Not Found',
+                'data' => []
+            ], 200);
+        }
      }
 
      public function slot_create(Request $request){
@@ -174,12 +199,28 @@ class RestaurantController extends Controller
 
      public function slot_info( $uuid){
         $rest =  Restaurent::where('uuid', $uuid)->first();
-        $data = Slot::where('restaurant_id', $rest->id)->where('status','=','active')->get();
-        return response()->json([
-            'status' => true,
-            'message' => 'Slot Info',
-            'data' => $data
-        ], 200);
+        if(!empty($rest)){
+            $data = Slot::where('restaurant_id', $rest->id)->where('status','=','active')->get();
+            if(!empty($data)){
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Slot Info',
+                    'data' => $data
+                ]);
+            }else{
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Slot Not Found',
+                    'data' => []
+                ], 200);
+            }
+        }else{
+            return response()->json([
+                'status' => false,
+                'message' => 'Restaurant Not Found',
+                'data' => []
+            ], 200);
+        }
      }
 
 
@@ -293,12 +334,31 @@ class RestaurantController extends Controller
 
      public function table_info($rest_uuid){
         $rest =  Restaurent::where('uuid', $rest_uuid)->first();
-        $data = TableMaster::where('restaurant_id', $rest->id)->get();
-        return response()->json([
-            'status' => true,
-            'message' => 'table Info',
-            'data' => $data
-        ], 200);
+
+        if(!empty($rest)){
+            $data = TableMaster::where('restaurant_id', $rest->id)->get();
+            if(!empty($data)){
+                return response()->json([
+                    'status' => true,
+                    'message' => 'table Info',
+                    'data' => $data
+                ]);
+            }else{
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'table Not Found',
+                        'data' => []
+                    ]);
+                }
+            }
+        else{
+            return response()->json([
+                'status' => false,
+                'message' => 'Restaurant Not Found',
+                'data' => []
+            ], 200);
+        }
+
      }
 
 
@@ -393,12 +453,28 @@ class RestaurantController extends Controller
 
     public function label_taq_info($rest_uuid){
         $rest =  Restaurent::where('uuid', $rest_uuid)->first();
-        $data = LabelTaq::where('restaurant_id', $rest->id)->get();
-        return response()->json([
-            'status' => true,
-            'message' => 'label Info',
-            'data' => $data
-        ], 200);
+        if(!empty($rest)){
+            $data = LabelTaq::where('restaurant_id', $rest->id)->get();
+            if(!empty($data)){
+                return response()->json([
+                    'status' => true,
+                    'message' => 'label Info',
+                    'data' => $data
+                ]);
+            }else{
+                return response()->json([
+                    'status' => false,
+                    'message' => 'label Not Found',
+                    'data' => []
+                ], 200);
+            }
+        }else{
+            return response()->json([
+                'status' => false,
+                'message' => 'Restaurant Not Found',
+                'data' => []
+            ], 200);
+        }
     }
 
 
@@ -502,12 +578,29 @@ class RestaurantController extends Controller
 
     public function about_taq_info($rest_uuid){
         $rest =  Restaurent::where('uuid', $rest_uuid)->first();
-        $data = AboutTaq::where('restaurant_id', $rest->id)->get();
-        return response()->json([
-            'status' => true,
-            'message' => ' about label Info',
-            'data' => $data
-        ], 200);
+        if(!empty($rest)){
+            $data = AboutTaq::where('restaurant_id', $rest->id)->get();
+            if(!empty($data)){
+                return response()->json([
+                    'status' => true,
+                    'message' => 'about label Info',
+                    'data' => $data
+                ]);
+            }else{
+                return response()->json([
+                    'status' => false,
+                    'message' => 'about label Not Found',
+                    'data' => []
+                ], 200);
+            }
+        }else{
+            return response()->json([
+                'status' => false,
+                'message' => 'Restaurant Not Found',
+                'data' => []
+            ], 200);
+        }
+
     }
 
 
