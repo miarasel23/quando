@@ -303,22 +303,23 @@ class AdminController extends Controller
 
 
     public function restaurent_single_info(Request $request,$uuid){
-
-
         $restaurant =  Restaurent::where('uuid', $uuid)->with('category_list','aval_slots','label_taqs','about_label_taqs')->where('status', 'active')->select(['id','uuid','restaurent_id','name','address','phone','email','category','description','post_code','status','avatar','website','online_order'])->first();
-        $availableSlots = Slot::where('restaurant_id', $restaurant->id)->where('day',$request->day)->where('status','active')->select([
-        'interval_time' ])->first();
-        $availableSlots = $restaurant->getAvailableSlots($request->day , $request->date ,$availableSlots->interval_time);
         if (empty($restaurant)) {
             return response()->json([
                 'status' => false,
                 'message' => 'Restaurant not found'
             ], 404);
         }
+        $availableSlots = Slot::where('restaurant_id', $restaurant->id)->where('day',$request->day)->where('status','active')->select([
+        'interval_time' ])->first();
+
+        if(!empty($availableSlots)){
+            $availableSlots = $restaurant->getAvailableSlots($request->day , $request->date ,$availableSlots->interval_time);
+        }
         return response()->json([
             'status' => true,
             'data' => $restaurant,
-            'available_slots' => $availableSlots,
+            'available_slots' => $availableSlots != null ? $availableSlots: [] ,
         ], 200);
     }
 }
