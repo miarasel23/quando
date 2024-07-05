@@ -251,7 +251,7 @@ class RestaurantController extends Controller
 
         $rest_data  = Restaurent::where('uuid', $request->rest_uuid)->first();
         $floor = FloorArea::where('uuid', $request->floor_uuid)->first();
-        if(!empty($rest_data)){
+        if(!empty($rest_data) && !empty($floor)){
 
             $data = TableMaster::create([
                 'restaurant_id' => $rest_data->id,
@@ -273,7 +273,7 @@ class RestaurantController extends Controller
         }else{
             return response()->json([
                 'status' => false,
-                'message' => 'Restaurent Not Found',
+                'message' => 'Restaurent Not Found or Floor Not Found',
                 'data' => []
             ], 200);
         }
@@ -305,7 +305,7 @@ class RestaurantController extends Controller
         $floor = FloorArea::where('uuid', $request->floor_uuid)->first();
 
         $edit_data = TableMaster::where('uuid', $request->uuid)->first();
-        if(!empty($edit_data)){
+        if(!empty($edit_data) && !empty($rest_data) && !empty($floor)){
             $edit_data->update([
                 'restaurant_id' => $rest_data->id,
                 'table_id' => $request->table_id,
@@ -326,7 +326,7 @@ class RestaurantController extends Controller
         }else{
             return response()->json([
                 'status' => false,
-                'message' => 'Restaurant Not Found',
+                'message' => 'Restaurant Not Found or Floor Not Found or table Not Found',
                 'data' => []
             ], 200);
         }
@@ -431,7 +431,7 @@ class RestaurantController extends Controller
         }
         $rest_data  = Restaurent::where('uuid', $request->rest_uuid)->first();
         $edit_data = LabelTaq::where('uuid', $request->uuid)->first();
-        if(!empty($edit_data)){
+        if(!empty($edit_data) ){
             $edit_data->update([
                 'restaurant_id' => $rest_data->id,
                 'name' => $request->name,
