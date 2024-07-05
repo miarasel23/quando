@@ -211,6 +211,11 @@ class AdminController extends Controller
                 'data' => $restaurent
             ], 200);
 
+        }else{
+            return response()->json([
+                'status' => false,
+                'message' => 'User not found'
+            ], 404);
         }
         if(!empty($user) && $user->user_type != 'super_admin'){
             $restaurent = Restaurent::where('uuid',$user->res_uuid)->get();
@@ -225,6 +230,11 @@ class AdminController extends Controller
                 'data' => $restaurent
             ], 200);
 
+        }else{
+            return response()->json([
+                'status' => false,
+                'message' => 'User not found'
+            ], 404);
         }
     }
 
