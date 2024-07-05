@@ -34,6 +34,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             Route::post('restaurant-create', [AdminController::class, 'restaurent_create']);
             Route::post('restaurant-update', [AdminController::class, 'restaurent_update']);
             Route::get('restaurant-info/{uuid}', [AdminController::class, 'restaurent_info']);
+            Route::get('restaurant-single-info/{uuid}', [AdminController::class, 'restaurent_single_info']);
             Route::get('restaurant-delete/{uuid}', [AdminController::class, 'restaurent_delete']);
         });
 

@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Carbon\Carbon;
+use DB;
 
 class Restaurent extends Model
 {
@@ -55,41 +57,93 @@ class Restaurent extends Model
 
 
 
-    public function getAvailableSlots($day, $date)
+    public function getAvailableSlots($day, $date,$interval)
     {
-        $currentDate = date('m/d/Y');
-        $currentTime = date('H:i');
-        $slots = $this->aval_slots()->where('day', $day)->where('status', '=', 'active')->get();
-        $bookedSlots = $this->slots_booked()->where([
-            ['day', $day],
-            ['reservation_date', $date],
-        ])->whereNotIn('status', ['completed', 'cancelled'])->orderBy('start')->get(['start', 'end']);
-        $availableSlots = collect();
-        foreach ($slots as $slot) {
-            $currentStart = ($date == $currentDate && $currentTime > $slot->slot_start) ? $currentTime : $slot->slot_start;
-            $slotEnd = $slot->slot_end;
-            foreach ($bookedSlots as $bookedSlot) {
-                if ($bookedSlot->start < $slotEnd && $bookedSlot->end > $currentStart) {
-                    if ($bookedSlot->start > $currentStart) {
-                        $availableSlots->push([
-                            'start' => $currentStart,
-                            'end' => $bookedSlot->start
-                        ]);
+        // $currentDate = date('m/d/Y');
+        // $currentTime = date('H:i');
+        // $slots = $this->aval_slots()->where('day', $day)->where('status', '=', 'active')->get();
+        // $bookedSlots = $this->slots_booked()->where([
+        //     ['day', $day],
+        //     ['reservation_date', $date],
+        // ])->whereNotIn('status', ['completed', 'cancelled'])->orderBy('start')->get(['start', 'end']);
+        // $availableSlots = collect();
+        // foreach ($slots as $slot) {
+        //     $currentStart = ($date == $currentDate && $currentTime > $slot->slot_start) ? $currentTime : $slot->slot_start;
+        //     $slotEnd = $slot->slot_end;
+        //     foreach ($bookedSlots as $bookedSlot) {
+        //         if ($bookedSlot->start < $slotEnd && $bookedSlot->end > $currentStart) {
+        //             if ($bookedSlot->start > $currentStart) {
+        //                 $availableSlots->push([
+        //                     'start' => $currentStart,
+        //                     'end' => $bookedSlot->start
+        //                 ]);
+        //             }
+        //             $currentStart = $bookedSlot->end;
+        //         }
+        //     }
+        //     if ($currentStart < $slotEnd) {
+        //         $availableSlots->push([
+        //             'start' => $currentStart,
+        //             'end' => $slotEnd
+        //         ]);
+        //     }
+        // }
+        // $filteredSlots = $availableSlots->reject(function($slot) use ($currentDate, $currentTime, $date) {
+        //     return ($date == $currentDate) && ($slot['end'] <= $currentTime);
+        // });
+        // return $filteredSlots->values();
+
+
+
+
+
+
+        $intervalTime = $interval; // default to 15 minutes if not provided
+
+         $slots = $this->aval_slots()->where('day', $day)->where('status', '=', 'active')->get();
+         foreach ($slots as $slot) {
+            $startTime = Carbon::parse( $slot->slot_start); // 9:00 AM
+            $endTime =  Carbon::parse( $slot->slot_end); // 12:00 AM (midnight)
+
+            // Calculate total duration in minutes
+            $totalDuration = $startTime->diffInMinutes($endTime);
+            // Calculate the number of intervals
+            $numberOfIntervals = $totalDuration / $intervalTime;
+            // Get all booked slots for the given day and date
+            $bookedSlots = DB::table('reservations')
+                ->where('day', $day)
+                ->where('reservation_date', $date)
+                ->whereNotIn('status', ['completed', 'cancelled'])
+                ->select('start', 'end')
+                ->get();
+            $availableSlots = collect();
+            for ($i = 0; $i < $numberOfIntervals; $i++) {
+                $slotStart = $startTime->copy()->addMinutes($i * $intervalTime);
+                $slotEnd = $slotStart->copy()->addMinutes($intervalTime);
+                $isAvailable = true;
+                foreach ($bookedSlots as $bookedSlot) {
+                    $bookedStart = Carbon::parse($bookedSlot->start);
+                    $bookedEnd = Carbon::parse($bookedSlot->end);
+
+                    if ($slotStart->lt($bookedEnd) && $slotEnd->gt($bookedStart)) {
+                        $isAvailable = false;
+                        break;
                     }
-                    $currentStart = $bookedSlot->end;
+                }
+                if ($isAvailable) {
+                    $availableSlots->push([
+                        'start' => $slotStart->format('H:i:s'),
+                        'end' => $slotEnd->format('H:i:s')
+                    ]);
                 }
             }
-            if ($currentStart < $slotEnd) {
-                $availableSlots->push([
-                    'start' => $currentStart,
-                    'end' => $slotEnd
-                ]);
-            }
-        }
-        $filteredSlots = $availableSlots->reject(function($slot) use ($currentDate, $currentTime, $date) {
-            return ($date == $currentDate) && ($slot['end'] <= $currentTime);
-        });
-        return $filteredSlots->values();
+            // Calculate total available minutes
+            $totalAvailableMinutes = $availableSlots->count() * $intervalTime;
+            return $availableSlots;
+         }
+
+
+
     }
     public function getActivitylogOptions(): LogOptions
     {

@@ -116,6 +116,7 @@ class RestaurantController extends Controller
             'rest_uuid' => 'required',
             'slot_start' => 'required',
             'slot_end' => 'required',
+            'interval_time' => 'required|numeric',
             'status' => 'required',
         ]);
         if ($validateUser->fails()) {
@@ -138,6 +139,7 @@ class RestaurantController extends Controller
                  $old->update([
                     'slot_start' => $request->slot_start,
                     'slot_end' => $request->slot_end,
+                    'interval_time' => $request->interval_time,
                     'status' => $request->status,
                  ]);
                 return response()->json([
@@ -151,6 +153,7 @@ class RestaurantController extends Controller
                     'restaurant_id' => $rest_data->id,
                     'slot_start' => $request->slot_start,
                     'slot_end' => $request->slot_end,
+                    'interval_time' => $request->interval_time,
                     'status' => $request->status,
                 ]);
                 return response()->json([

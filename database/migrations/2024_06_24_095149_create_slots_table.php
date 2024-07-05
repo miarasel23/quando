@@ -21,6 +21,7 @@ return new class extends Migration
             $table->enum('day', ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday']);
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->text('history')->nullable();
+            $table->Integer('interval_time');
             $table->timestamps();
         });
     }
