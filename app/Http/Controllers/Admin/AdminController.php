@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 use App\Models\Restaurent;
+use App\Models\Slot;
 use App\Models\Category;
 use Auth;
 use Laravel\Sanctum\PersonalAccessToken;
@@ -42,6 +43,12 @@ class AdminController extends Controller
             }
            if(Auth::attempt($request->only(['email', 'password']))){
                 $user = Auth::user();
+                if($user->status == 'inactive'){
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Your Account is Inactive',
+                    ], 401);
+                }
                 $token = $user->createToken('login_access_tocken')->plainTextToken;
                 return response()->json([
                     'status' => true,
@@ -210,6 +217,11 @@ class AdminController extends Controller
                 'data' => $restaurent
             ], 200);
 
+        }else{
+            return response()->json([
+                'status' => false,
+                'message' => 'User not found'
+            ], 404);
         }
         if(!empty($user) && $user->user_type != 'super_admin'){
             $restaurent = Restaurent::where('uuid',$user->res_uuid)->get();
@@ -224,6 +236,11 @@ class AdminController extends Controller
                 'data' => $restaurent
             ], 200);
 
+        }else{
+            return response()->json([
+                'status' => false,
+                'message' => 'User not found'
+            ], 404);
         }
     }
 
@@ -245,8 +262,7 @@ class AdminController extends Controller
     }
 
     public function restaurent_list(Request $request){
-        // $restaurant = Restaurent::find(1);
-        // $availableSlots = $restaurant->getAvailableSlots('sunday','07/01/2024');
+
         $perPage = $request->input('per_page', 10);
         $restaurent = Restaurent::orderBy('id', 'desc')->with('category_list','aval_slots','label_taqs','about_label_taqs')->where('status', 'active')->select(['id','uuid','restaurent_id','name','address','phone','email','category','description','post_code','status','avatar','website','online_order'])->paginate($perPage);
         if ($restaurent->count() == 0) {
@@ -295,6 +311,31 @@ class AdminController extends Controller
         return response()->json([
             'status' => true,
             'data' => $restaurants
+        ], 200);
+    }
+
+
+
+
+
+    public function restaurent_single_info(Request $request,$uuid){
+        $restaurant =  Restaurent::where('uuid', $uuid)->with('category_list','aval_slots','label_taqs','about_label_taqs')->where('status', 'active')->select(['id','uuid','restaurent_id','name','address','phone','email','category','description','post_code','status','avatar','website','online_order'])->first();
+        if (empty($restaurant)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Restaurant not found'
+            ], 404);
+        }
+        $availableSlots = Slot::where('restaurant_id', $restaurant->id)->where('day',$request->day)->where('status','active')->select([
+        'interval_time' ])->first();
+
+        if(!empty($availableSlots)){
+            $availableSlots = $restaurant->getAvailableSlots($request->day , $request->date ,$availableSlots->interval_time);
+        }
+        return response()->json([
+            'status' => true,
+            'data' => $restaurant,
+            'available_slots' => $availableSlots != null ? $availableSlots: [] ,
         ], 200);
     }
 }

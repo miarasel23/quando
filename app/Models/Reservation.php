@@ -11,10 +11,27 @@ class Reservation extends Model
 {
     use HasFactory,LogsActivity;
 
+
+    protected $fillable = [
+
+        'guest_information_id',
+        'table_master_id',
+        'restaurant_id',
+        'reservation_date',
+        'reservation_time',
+        'start',
+        'end',
+        'number_of_people',
+        'status',
+        'updated_by',
+    ];
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults();
     }
+
+
     protected static function boot()
     {
         parent::boot();

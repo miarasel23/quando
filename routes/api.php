@@ -7,13 +7,17 @@ use App\Models\User;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RestaurantController;
+use App\Http\Controllers\ReservationController;
 
 
 
 
 
 Route::prefix('v1/user/')->group(function () {
+
     Route::post('/login',[AdminController::class,'Login']);
+    Route::post('guest-register', [UserController::class, 'guest_register']);
+    Route::post('guest-login', [UserController::class, 'guest_login']);
     Route::get('/restaurant',[AdminController::class,'restaurent_list']);
     Route::get('/search-restaurant',[AdminController::class,'restaurent_search_list']);
     Route::get('/category',[AdminController::class,'category']);
@@ -30,10 +34,25 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::prefix('v1/secure')->group(function () {
 
         Route::post('logout', [AdminController::class, 'logout']);
+        Route::post('guest-logout', [UserController::class, 'logout']);
+        Route::prefix('guest-user')->group(function () {
+            Route::get('profile/{uuid}', [UserController::class, 'profile']);
+            Route::post('profile-update', [UserController::class, 'profile_update']);
+        });
+
+
+        Route::prefix('reservation')->group(function () {
+            Route::get('reservation-time-hold', [ReservationController::class, 'time_hold']);
+            Route::post('profile-update', [ReservationController::class, 'profile_update']);
+        });
+
+
+
         Route::prefix('admin')->group(function () {
             Route::post('restaurant-create', [AdminController::class, 'restaurent_create']);
             Route::post('restaurant-update', [AdminController::class, 'restaurent_update']);
             Route::get('restaurant-info/{uuid}', [AdminController::class, 'restaurent_info']);
+            Route::get('restaurant-single-info/{uuid}', [AdminController::class, 'restaurent_single_info']);
             Route::get('restaurant-delete/{uuid}', [AdminController::class, 'restaurent_delete']);
         });
 
