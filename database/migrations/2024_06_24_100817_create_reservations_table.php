@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('uuid')->unique();
             $table->unsignedBigInteger('guest_information_id');
             $table->foreign('guest_information_id')->references('id')->on('guest_informaions')->onDelete('cascade')->onUpdate('cascade');
-            $table->unsignedBigInteger('table_master_id');
+            $table->unsignedBigInteger('table_master_id')->nullable();
             $table->foreign('table_master_id')->references('id')->on('table_masters')->onDelete('cascade')->onUpdate('cascade');
             $table->unsignedBigInteger('restaurant_id');
             $table->foreign('restaurant_id')->references('id')->on('restaurents')->onDelete('cascade')->onUpdate('cascade');
@@ -24,8 +24,9 @@ return new class extends Migration
             $table->string('reservation_time');
             $table->string('start')->nullable();
             $table->string('end')->nullable();
+            $table->string('day');
             $table->string('number_of_people');
-            $table->enum('status', ['pending', 'cancelled', 'confirmed', 'completed'])->default('pending');
+            $table->enum('status', ['pending', 'cancelled', 'confirmed', 'completed','hold'])->default('pending');
             $table->Integer('updated_by')->nullable();
             $table->String('noted')->nullable();
             $table->timestamps();

@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RestaurantController;
+use App\Http\Controllers\ReservationController;
 
 
 
@@ -38,6 +39,15 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             Route::get('profile/{uuid}', [UserController::class, 'profile']);
             Route::post('profile-update', [UserController::class, 'profile_update']);
         });
+
+
+        Route::prefix('reservation')->group(function () {
+            Route::get('reservation-time-hold', [ReservationController::class, 'time_hold']);
+            Route::post('profile-update', [ReservationController::class, 'profile_update']);
+        });
+
+
+
         Route::prefix('admin')->group(function () {
             Route::post('restaurant-create', [AdminController::class, 'restaurent_create']);
             Route::post('restaurant-update', [AdminController::class, 'restaurent_update']);
