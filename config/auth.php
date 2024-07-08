@@ -45,6 +45,13 @@ return [
             'provider' => 'users',
             'hash' => true,
         ],
+        'guest_api' => [
+            'driver' => 'session',
+            'provider' => 'guest_users',
+            'hash' => true,
+        ],
+
+
     ],
 
     /*
@@ -70,10 +77,10 @@ return [
             'model' => env('AUTH_MODEL', App\Models\User::class),
         ],
 
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+        'guest_users' => [
+            'driver' => 'eloquent',
+            'model' => env('AUTH_MODEL', App\Models\GuestInformaion::class),
+        ],
     ],
 
     /*
@@ -97,6 +104,13 @@ return [
 
     'passwords' => [
         'users' => [
+            'provider' => 'users',
+            'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+
+        'guest_users' => [
             'provider' => 'users',
             'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
             'expire' => 60,

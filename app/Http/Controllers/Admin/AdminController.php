@@ -43,6 +43,12 @@ class AdminController extends Controller
             }
            if(Auth::attempt($request->only(['email', 'password']))){
                 $user = Auth::user();
+                if($user->status == 'inactive'){
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Your Account is Inactive',
+                    ], 401);
+                }
                 $token = $user->createToken('login_access_tocken')->plainTextToken;
                 return response()->json([
                     'status' => true,

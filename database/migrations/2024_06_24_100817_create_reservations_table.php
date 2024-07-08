@@ -26,6 +26,8 @@ return new class extends Migration
             $table->string('end')->nullable();
             $table->string('number_of_people');
             $table->enum('status', ['pending', 'cancelled', 'confirmed', 'completed'])->default('pending');
+            $table->Integer('updated_by')->nullable();
+            $table->String('noted')->nullable();
             $table->timestamps();
         });
     }

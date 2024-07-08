@@ -17,14 +17,19 @@ return new class extends Migration
             $table->string('first_name');
             $table->string('last_name');
             $table->string('email')->unique();
+            $table->string('password');
             $table->string('phone')->unique();
             $table->string('address')->nullable();
             $table->string('post_code');
             $table->string('city');
             $table->string('country');
             $table->enum('status', ['active', 'inactive'])->default('active');
+            $table->rememberToken();
             $table->timestamps();
         });
+
+
+
     }
 
     /**
@@ -33,5 +38,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('guest_informaions');
+
     }
 };
