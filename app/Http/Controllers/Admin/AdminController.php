@@ -10,6 +10,8 @@ use App\Models\User;
 use App\Models\Restaurent;
 use App\Models\Slot;
 use App\Models\Category;
+use App\Models\Reservation;
+use App\Models\TableMaster;
 use Auth;
 use Laravel\Sanctum\PersonalAccessToken;
 use  Illuminate\Support\Facades\DB;
@@ -319,6 +321,7 @@ class AdminController extends Controller
 
 
     public function restaurent_single_info(Request $request,$uuid){
+
         $restaurant =  Restaurent::where('uuid', $uuid)->with('category_list','aval_slots','label_taqs','about_label_taqs')->where('status', 'active')->select(['id','uuid','restaurent_id','name','address','phone','email','category','description','post_code','status','avatar','website','online_order'])->first();
         if (empty($restaurant)) {
             return response()->json([
@@ -326,16 +329,61 @@ class AdminController extends Controller
                 'message' => 'Restaurant not found'
             ], 404);
         }
-        $availableSlots = Slot::where('restaurant_id', $restaurant->id)->where('day',$request->day)->where('status','active')->select([
-        'interval_time' ])->first();
 
-        if(!empty($availableSlots)){
-            $availableSlots = $restaurant->getAvailableSlots($request->day , $request->date ,$availableSlots->interval_time);
+
+        $validateUser = Validator::make($request->all(), [
+
+            'start_time' => 'required',
+            'end_time' => 'required',
+            'date' => 'required',
+            'day'=>'required',
+
+        ]);
+        if ($validateUser->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'validation error',
+                'errors' => $validateUser->errors()
+            ], 401);
         }
-        return response()->json([
-            'status' => true,
-            'data' => $restaurant,
-            'available_slots' => $availableSlots != null ? $availableSlots: [] ,
-        ], 200);
+
+        $tabledata = Reservation::where([
+            ['start', '=', $request->start_time],
+            ['end', '=', $request->end_time],
+            ['day', '=', $request->day],
+            ['reservation_date', '=', $request->date],
+            ['restaurant_id', '=', $restaurant->id]
+           ])
+           ->whereNotIn('status', ['cancelled', 'completed'])
+           ->get();
+
+           $allTables = TableMaster::where('restaurant_id', $restaurant->id)->get();
+            if (count($tabledata) > 0 && count($allTables) > 0) {
+                $reservedTableIds = $tabledata->pluck('table_master_id')->toArray();
+                $availableTables = $allTables->filter(function ($table) use ($reservedTableIds) {
+                    return !in_array($table->id, $reservedTableIds);
+                })->values();
+            } else {
+                $availableTables = $allTables;
+            }
+
+            if(count($availableTables) > 0){
+                $availableSlots = Slot::where('restaurant_id', $restaurant->id)->where('day',$request->day)->where('status','active')->select([
+                    'interval_time' ])->first();
+
+                    if(!empty($availableSlots)){
+                        $availableSlots = $restaurant->getAvailableSlots($request->day , $request->date ,$availableSlots->interval_time);
+                    }
+                    return response()->json([
+                        'status' => true,
+                        'data' => $restaurant,
+                        'available_slots' => $availableSlots != null ? $availableSlots: [] ,
+                    ], 200);
+            }else{
+                return response()->json([
+                    'status' => false,
+                    'message' => 'No Tables Available'
+                ], 404);
+            }
     }
 }

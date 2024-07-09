@@ -15,7 +15,7 @@ class Category extends Model
         'name',
     ];
 
-    public function restaurents()
+    public function restaurants()
     {
         return $this->hasMany(Restaurent::class,'category','id')->orderBy('id', 'desc')->with('category_list','aval_slots','label_taqs','about_label_taqs')->where('status', 'active')->select(['id','uuid','restaurent_id','name','address','phone','email','category','description','post_code','status','avatar','website','online_order']);
     }
