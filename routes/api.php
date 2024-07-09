@@ -21,15 +21,13 @@ Route::prefix('v1/user/')->group(function () {
     Route::get('/restaurant',[AdminController::class,'restaurent_list']);
     Route::get('/search-restaurant',[AdminController::class,'restaurent_search_list']);
     Route::get('/category',[AdminController::class,'category']);
+    Route::get('restaurant-single-info/{uuid}', [AdminController::class, 'restaurent_single_info']);
 });
 
 
 
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
-
-
-
 
     Route::prefix('v1/secure')->group(function () {
 
@@ -52,7 +50,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             Route::post('restaurant-create', [AdminController::class, 'restaurent_create']);
             Route::post('restaurant-update', [AdminController::class, 'restaurent_update']);
             Route::get('restaurant-info/{uuid}', [AdminController::class, 'restaurent_info']);
-            Route::get('restaurant-single-info/{uuid}', [AdminController::class, 'restaurent_single_info']);
+
             Route::get('restaurant-delete/{uuid}', [AdminController::class, 'restaurent_delete']);
         });
 
