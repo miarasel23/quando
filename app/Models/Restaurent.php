@@ -47,11 +47,11 @@ class Restaurent extends Model
     }
 
 
-    public function label_taqs(){
+    public function label_tags(){
         return $this->hasMany(LabelTaq::class,'restaurant_id','id')->where('status','active')->select(['id','uuid','name','status','restaurant_id']);
     }
 
-    public function about_label_taqs(){
+    public function about_label_tags(){
         return $this->hasMany(AboutTaq::class,'restaurant_id','id')->where('status','active')->select(['id','uuid','name','status','restaurant_id']);
     }
 
