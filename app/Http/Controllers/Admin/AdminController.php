@@ -289,20 +289,20 @@ class AdminController extends Controller
         if ($postCode) {
             $query->where('post_code', 'like', '%' . $postCode . '%');
         }
-        if(!$name && !$postCode){
-            return response()->json([
-                'status' => false,
-                'data' => [],
-                'pagination' => [
-                    'total' => 0,
-                    'per_page' => $perPage,
-                    'current_page' => 1,
-                    'last_page' => 1,
-                    'next_page_url' => null,
-                    'prev_page_url' => null,
-                ]
-            ], 200);
-        }
+        // if(!$name && !$postCode){
+        //     return response()->json([
+        //         'status' => false,
+        //         'data' => [],
+        //         'pagination' => [
+        //             'total' => 0,
+        //             'per_page' => $perPage,
+        //             'current_page' => 1,
+        //             'last_page' => 1,
+        //             'next_page_url' => null,
+        //             'prev_page_url' => null,
+        //         ]
+        //     ], 200);
+        // }
         $restaurants = $query->paginate($perPage);
         if ($restaurants->count() == 0) {
             return response()->json([
