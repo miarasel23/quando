@@ -250,7 +250,7 @@ class AdminController extends Controller
 
 
     public function category(){
-        $category = Category::orderBy('id', 'desc')->with('restaurents')->select(['id','name'])->get();
+        $category = Category::orderBy('id', 'desc')->with('restaurants')->select(['id','name'])->get();
         if ($category->count() == 0) {
             return response()->json([
                 'status' => false,
@@ -322,7 +322,7 @@ class AdminController extends Controller
 
     public function restaurent_single_info(Request $request,$uuid){
 
-        $restaurant =  Restaurent::where('uuid', $uuid)->with('category_list','aval_slots','label_taqs','about_label_taqs')->where('status', 'active')->select(['id','uuid','restaurent_id','name','address','phone','email','category','description','post_code','status','avatar','website','online_order'])->first();
+        $restaurant =  Restaurent::where('uuid', $uuid)->with('category_list','aval_slots','label_tags','about_label_tags')->where('status', 'active')->select(['id','uuid','restaurent_id','name','address','phone','email','category','description','post_code','status','avatar','website','online_order'])->first();
         if (empty($restaurant)) {
             return response()->json([
                 'status' => false,
