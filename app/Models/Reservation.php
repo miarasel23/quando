@@ -23,8 +23,26 @@ class Reservation extends Model
         'end',
         'number_of_people',
         'status',
+        'day',
         'updated_by',
     ];
+
+
+    public function guest_information()
+    {
+        return $this->belongsTo(GuestInformaion::class, 'guest_information_id', 'id');
+    }
+
+    public function table_master()
+    {
+        return $this->belongsTo(TableMaster::class, 'table_master_id', 'id');
+    }
+
+
+    public function restaurant()
+    {
+        return $this->belongsTo(Restaurent::class, 'restaurant_id', 'id');
+    }
 
     public function getActivitylogOptions(): LogOptions
     {
