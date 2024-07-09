@@ -333,10 +333,10 @@ class AdminController extends Controller
 
         $validateUser = Validator::make($request->all(), [
 
-            'start_time' => 'required',
-            'end_time' => 'required',
-            'date' => 'required',
-            'day'=>'required',
+            'start_time' => 'string',
+            'end_time' => 'string',
+            'date' => 'string',
+            'day'=>'string',
 
         ]);
         if ($validateUser->fails()) {
