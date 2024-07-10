@@ -348,8 +348,6 @@ class AdminController extends Controller
         }
 
         $tabledata = Reservation::where([
-            ['start', '=', $request->start_time],
-            ['end', '=', $request->end_time],
             ['day', '=', $request->day],
             ['reservation_date', '=', $request->date],
             ['restaurant_id', '=', $restaurant->id]
