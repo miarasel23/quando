@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('name');
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->unsignedBigInteger('restaurant_id');
-            $table->foreign('restaurant_id')->references('id')->on('restaurents')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('restaurant_id')->references('id')->on('restaurants')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });
 

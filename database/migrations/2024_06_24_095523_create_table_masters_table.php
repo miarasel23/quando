@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('uuid')->unique();
             $table->unsignedBigInteger('restaurant_id');
-            $table->foreign('restaurant_id')->references('id')->on('restaurents')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('restaurant_id')->references('id')->on('restaurants')->onDelete('cascade')->onUpdate('cascade');
             $table->string('table_id');
             $table->string('table_name');
             $table->string('capacity');

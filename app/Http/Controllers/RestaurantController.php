@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 use App\Models\FloorArea;
-use App\Models\Restaurent;
+use App\Models\Restaurant;
 use App\Models\Slot;
 use App\Models\TableMaster;
 use App\Models\LabelTaq;
@@ -34,7 +34,7 @@ class RestaurantController extends Controller
                 'errors' => $validateUser->errors()
             ], 401);
         }
-        $rest_data  = Restaurent::where('uuid', $request->rest_uuid)->first();
+        $rest_data  = Restaurant::where('uuid', $request->rest_uuid)->first();
 
 
         if(!empty($rest_data)){
@@ -70,7 +70,7 @@ class RestaurantController extends Controller
                 'errors' => $validateUser->errors()
             ], 401);
         }
-        $rest_data  = Restaurent::where('uuid', $request->rest_uuid)->first();
+        $rest_data  = Restaurant::where('uuid', $request->rest_uuid)->first();
         if(!empty($rest_data)){
            FloorArea::where('uuid', $request->uuid)->update([
                 'name' => $request->name,
@@ -92,7 +92,7 @@ class RestaurantController extends Controller
 
 
      public function floor_area_info( $uuid){
-        $rest =  Restaurent::where('uuid', $uuid)->first();
+        $rest =  Restaurant::where('uuid', $uuid)->first();
         if(!empty($rest)){
             $data = FloorArea::where('restaurant_id', $rest->id)->get();
             if(!empty($data)){
@@ -151,7 +151,7 @@ class RestaurantController extends Controller
                 'errors' => $validateUser->errors()
             ], 401);
         }
-        $rest_data  = Restaurent::where('uuid', $request->rest_uuid)->first();
+        $rest_data  = Restaurant::where('uuid', $request->rest_uuid)->first();
         if(!empty($rest_data)){
             $old = Slot::where('day', $request->day)->where('restaurant_id', $rest_data->id)->first();
             if(!empty($old)){
@@ -198,7 +198,7 @@ class RestaurantController extends Controller
 
 
      public function slot_info( $uuid){
-        $rest =  Restaurent::where('uuid', $uuid)->first();
+        $rest =  Restaurant::where('uuid', $uuid)->first();
         if(!empty($rest)){
             $data = Slot::where('restaurant_id', $rest->id)->where('status','=','active')->get();
             if(!empty($data)){
@@ -249,7 +249,7 @@ class RestaurantController extends Controller
             ], 401);
         }
 
-        $rest_data  = Restaurent::where('uuid', $request->rest_uuid)->first();
+        $rest_data  = Restaurant::where('uuid', $request->rest_uuid)->first();
         $floor = FloorArea::where('uuid', $request->floor_uuid)->first();
         if(!empty($rest_data) && !empty($floor)){
 
@@ -273,7 +273,7 @@ class RestaurantController extends Controller
         }else{
             return response()->json([
                 'status' => false,
-                'message' => 'Restaurent Not Found or Floor Not Found',
+                'message' => 'Restaurant Not Found or Floor Not Found',
                 'data' => []
             ], 200);
         }
@@ -301,7 +301,7 @@ class RestaurantController extends Controller
                 'errors' => $validateUser->errors()
             ], 401);
         }
-        $rest_data  = Restaurent::where('uuid', $request->rest_uuid)->first();
+        $rest_data  = Restaurant::where('uuid', $request->rest_uuid)->first();
         $floor = FloorArea::where('uuid', $request->floor_uuid)->first();
 
         $edit_data = TableMaster::where('uuid', $request->uuid)->first();
@@ -333,7 +333,7 @@ class RestaurantController extends Controller
      }
 
      public function table_info($rest_uuid){
-        $rest =  Restaurent::where('uuid', $rest_uuid)->first();
+        $rest =  Restaurant::where('uuid', $rest_uuid)->first();
 
         if(!empty($rest)){
             $data = TableMaster::where('restaurant_id', $rest->id)->get();
@@ -393,7 +393,7 @@ class RestaurantController extends Controller
                 'errors' => $validateUser->errors()
             ], 401);
         }
-        $rest_data  = Restaurent::where('uuid', $request->rest_uuid)->first();
+        $rest_data  = Restaurant::where('uuid', $request->rest_uuid)->first();
         if(!empty($rest_data)){
             $data=LabelTaq::create([
                 'restaurant_id' => $rest_data->id,
@@ -429,7 +429,7 @@ class RestaurantController extends Controller
                 'errors' => $validateUser->errors()
             ], 401);
         }
-        $rest_data  = Restaurent::where('uuid', $request->rest_uuid)->first();
+        $rest_data  = Restaurant::where('uuid', $request->rest_uuid)->first();
         $edit_data = LabelTaq::where('uuid', $request->uuid)->first();
         if(!empty($edit_data) ){
             $edit_data->update([
@@ -452,7 +452,7 @@ class RestaurantController extends Controller
     }
 
     public function label_taq_info($rest_uuid){
-        $rest =  Restaurent::where('uuid', $rest_uuid)->first();
+        $rest =  Restaurant::where('uuid', $rest_uuid)->first();
         if(!empty($rest)){
             $data = LabelTaq::where('restaurant_id', $rest->id)->get();
             if(!empty($data)){
@@ -518,7 +518,7 @@ class RestaurantController extends Controller
                 'errors' => $validateUser->errors()
             ], 401);
         }
-        $rest_data  = Restaurent::where('uuid', $request->rest_uuid)->first();
+        $rest_data  = Restaurant::where('uuid', $request->rest_uuid)->first();
         if(!empty($rest_data)){
             $data=AboutTaq::create([
                 'restaurant_id' => $rest_data->id,
@@ -554,7 +554,7 @@ class RestaurantController extends Controller
                 'errors' => $validateUser->errors()
             ], 401);
         }
-        $rest_data  = Restaurent::where('uuid', $request->rest_uuid)->first();
+        $rest_data  = Restaurant::where('uuid', $request->rest_uuid)->first();
         $edit_data = AboutTaq::where('uuid', $request->uuid)->first();
         if(!empty($edit_data)){
             $edit_data->update([
@@ -577,7 +577,7 @@ class RestaurantController extends Controller
     }
 
     public function about_taq_info($rest_uuid){
-        $rest =  Restaurent::where('uuid', $rest_uuid)->first();
+        $rest =  Restaurant::where('uuid', $rest_uuid)->first();
         if(!empty($rest)){
             $data = AboutTaq::where('restaurant_id', $rest->id)->get();
             if(!empty($data)){
