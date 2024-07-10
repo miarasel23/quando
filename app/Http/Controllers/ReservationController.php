@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
-use App\Models\Restaurent;
+use App\Models\Restaurant;
 use App\Models\Reservation;
 use App\Models\GuestInformaion;
 use App\Models\TableMaster;
@@ -36,7 +36,7 @@ class ReservationController extends Controller
                 'errors' => $validateUser->errors()
             ], 401);
         }
-       $rest_data = Restaurent::where('uuid', $request->rest_uuid)->first();
+       $rest_data = Restaurant::where('uuid', $request->rest_uuid)->first();
        if($request->user_uuid != null){
            $user_data = GuestInformaion::where('uuid', $request->user_uuid)->first();
        }
@@ -138,11 +138,14 @@ class ReservationController extends Controller
         }
         $reservation = Reservation::where('uuid', $request->reservation_uuid)->first();
         if($reservation != null){
-            $reservation->delete();
-            return response()->json([
-                'status' => true,
-                'message' => 'Reservation Hold Removed Successfully',
-            ], 200);
+            if($reservation->status == 'hold'){
+                $reservation->delete();
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Reservation Hold Removed Successfully',
+                ], 200);
+            }
+
         }else{
             return response()->json([
                 'status' => false,

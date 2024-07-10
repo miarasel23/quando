@@ -18,10 +18,10 @@ Route::prefix('v1/user/')->group(function () {
     Route::post('/login',[AdminController::class,'Login']);
     Route::post('guest-register', [UserController::class, 'guest_register']);
     Route::post('guest-login', [UserController::class, 'guest_login']);
-    Route::get('/restaurant',[AdminController::class,'restaurent_list']);
-    Route::get('/search-restaurant',[AdminController::class,'restaurent_search_list']);
+    Route::get('/restaurant',[AdminController::class,'restaurant_list']);
+    Route::get('/search-restaurant',[AdminController::class,'restaurant_search_list']);
     Route::get('/category',[AdminController::class,'category']);
-    Route::get('restaurant-single-info/{uuid}', [AdminController::class, 'restaurent_single_info']);
+    Route::get('restaurant-single-info/{uuid}', [AdminController::class, 'restaurant_single_info']);
 
 
     Route::prefix('reservation')->group(function () {
@@ -53,11 +53,11 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
 
         Route::prefix('admin')->group(function () {
-            Route::post('restaurant-create', [AdminController::class, 'restaurent_create']);
-            Route::post('restaurant-update', [AdminController::class, 'restaurent_update']);
-            Route::get('restaurant-info/{uuid}', [AdminController::class, 'restaurent_info']);
+            Route::post('restaurant-create', [AdminController::class, 'restaurant_create']);
+            Route::post('restaurant-update', [AdminController::class, 'restaurant_update']);
+            Route::get('restaurant-info/{uuid}', [AdminController::class, 'restaurant_info']);
 
-            Route::get('restaurant-delete/{uuid}', [AdminController::class, 'restaurent_delete']);
+            Route::get('restaurant-delete/{uuid}', [AdminController::class, 'restaurant_delete']);
         });
 
 

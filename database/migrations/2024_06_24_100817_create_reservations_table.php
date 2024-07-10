@@ -19,7 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('table_master_id')->nullable();
             $table->foreign('table_master_id')->references('id')->on('table_masters')->onDelete('cascade')->onUpdate('cascade');
             $table->unsignedBigInteger('restaurant_id');
-            $table->foreign('restaurant_id')->references('id')->on('restaurents')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('restaurant_id')->references('id')->on('restaurants')->onDelete('cascade')->onUpdate('cascade');
             $table->string('reservation_date');
             $table->string('reservation_time');
             $table->string('start')->nullable();

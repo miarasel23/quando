@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('uuid')->unique();
             $table->unsignedBigInteger('restaurant_id');
-            $table->foreign('restaurant_id')->references('id')->on('restaurents')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('restaurant_id')->references('id')->on('restaurants')->onDelete('cascade')->onUpdate('cascade');
             $table->string('slot_start');
             $table->string('slot_end');
             $table->enum('day', ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday']);

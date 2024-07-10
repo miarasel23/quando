@@ -10,13 +10,13 @@ use Spatie\Activitylog\LogOptions;
 use Carbon\Carbon;
 use DB;
 
-class Restaurent extends Model
+class Restaurant extends Model
 {
     use HasFactory,LogsActivity;
 
     protected $fillable = [
         'uuid',
-        'restaurent_id',
+        'restaurant_id',
         'name',
         'address',
         'phone',
