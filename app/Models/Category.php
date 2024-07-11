@@ -17,7 +17,7 @@ class Category extends Model
 
     public function restaurants()
     {
-        return $this->hasMany(Restaurant::class,'category','id')->orderBy('id', 'desc')->with('category_list','aval_slots','label_tags','about_label_tags')->where('status', 'active')->select(['id','uuid','restaurant_id','name','address','phone','email','category','description','post_code','status','avatar','website','online_order']);
+        return $this->hasMany(Restaurant::class,'category','id')->orderBy('id', 'desc')->with('category_list','aval_slots','label_tags','about_label_tags','menus','photos','reviews',)->where('status', 'active')->select(['id','uuid','restaurant_id','name','address','phone','email','category','description','post_code','status','avatar','website','online_order']);
     }
 
     public function getActivitylogOptions(): LogOptions

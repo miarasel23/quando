@@ -7,26 +7,25 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
-class LabelTaq extends Model
+class Photo extends Model
 {
-    use HasFactory,LogsActivity;
+    use  HasFactory,LogsActivity;
 
 
-    protected $fillable = [
-        'uuid',
-        'name',
-        'status',
-        'restaurant_id'
+  protected $fillable = [
 
-    ];
+    'avatar',
+    'restaurant_id',
+    'status'
+  ];
 
-
+  public function photo_description(){
+    return $this->hasOne(SectionDescription::class,'restaurant_id','restaurant_id')->where('section','photo');
+  }
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults();
     }
-
-
 
     protected static function boot()
     {
