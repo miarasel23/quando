@@ -7,16 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
-class LabelTaq extends Model
+class MenuCatergory extends Model
 {
-    use HasFactory,LogsActivity;
+    use  HasFactory,LogsActivity;
 
 
     protected $fillable = [
-        'uuid',
         'name',
-        'status',
-        'restaurant_id'
+        'status'
 
     ];
 
@@ -25,8 +23,6 @@ class LabelTaq extends Model
     {
         return LogOptions::defaults();
     }
-
-
 
     protected static function boot()
     {

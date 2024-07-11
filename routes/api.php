@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RestaurantController;
 use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\FunctionController;
 
 
 
@@ -22,6 +23,8 @@ Route::prefix('v1/user/')->group(function () {
     Route::get('/search-restaurant',[AdminController::class,'restaurant_search_list']);
     Route::get('/category',[AdminController::class,'category']);
     Route::get('restaurant-single-info/{uuid}', [AdminController::class, 'restaurant_single_info']);
+
+    Route::post('review-create', [FunctionController::class, 'review_create']);
 
 
     Route::prefix('reservation')->group(function () {
@@ -39,6 +42,8 @@ Route::prefix('v1/user/')->group(function () {
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
 
+
+
     Route::prefix('v1/secure')->group(function () {
 
         Route::post('logout', [AdminController::class, 'logout']);
@@ -47,6 +52,28 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             Route::get('profile/{uuid}', [UserController::class, 'profile']);
             Route::post('profile-update', [UserController::class, 'profile_update']);
         });
+
+
+        Route::prefix('restaurant-function')->group(function () {
+            Route::get('menu-catergory', [FunctionController::class, 'menu_catergory']);
+            Route::post('menu-create', [FunctionController::class, 'menu_create']);
+            Route::post('menu-update', [FunctionController::class, 'menu_update']);
+            Route::get('menu-info/{uuid}', [FunctionController::class, 'menu_info']);
+            Route::get('menu-delete/{uuid}', [FunctionController::class, 'menu_delete']);
+
+            // ************************* photos ***********************************
+            Route::post('rest-photo', [FunctionController::class, 'rest_photo']);
+            Route::post('rest-photo-update', [FunctionController::class, 'rest_photo_update']);
+            Route::get('rest-photo-info/{uuid}', [FunctionController::class, 'rest_photo_info']);
+            Route::get('rest-photo-delete/{uuid}', [FunctionController::class, 'rest_photo_delete']);
+
+            Route::post('review-update', [FunctionController::class, 'review_update']);
+            Route::get('review-list/{rest_id}', [FunctionController::class, 'review_info']);
+
+        });
+
+
+
 
 
 

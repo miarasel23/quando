@@ -7,27 +7,22 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
-class LabelTaq extends Model
+class SectionDescription extends Model
 {
-    use HasFactory,LogsActivity;
+    use  HasFactory,LogsActivity;
 
 
     protected $fillable = [
-        'uuid',
-        'name',
-        'status',
-        'restaurant_id'
-
+        'description',
+        'section',
+        'restaurant_id',
+        'status'
     ];
-
 
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults();
     }
-
-
-
     protected static function boot()
     {
         parent::boot();

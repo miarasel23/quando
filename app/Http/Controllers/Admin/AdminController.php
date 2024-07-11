@@ -266,7 +266,7 @@ class AdminController extends Controller
     public function restaurant_list(Request $request){
 
         $perPage = $request->input('per_page', 10);
-        $restaurant = Restaurant::orderBy('id', 'desc')->with('category_list','aval_slots','label_tags','about_label_tags')->where('status', 'active')->select(['id','uuid','restaurant_id','name','address','phone','email','category','description','post_code','status','avatar','website','online_order'])->paginate($perPage);
+        $restaurant = Restaurant::orderBy('id', 'desc')->with('category_list','aval_slots','label_tags','about_label_tags','menus','photos','reviews',)->where('status', 'active')->select(['id','uuid','restaurant_id','name','address','phone','email','category','description','post_code','status','avatar','website','online_order'])->paginate($perPage);
         if ($restaurant->count() == 0) {
             return response()->json([
                 'status' => false,
@@ -282,7 +282,7 @@ class AdminController extends Controller
         $perPage = $request->input('per_page', 10);
         $name = $request->input('name');
         $postCode = $request->input('post_code');
-        $query  = Restaurant::orderBy('id', 'desc')->with('category_list','aval_slots','label_tags','about_label_tags')->where('status', 'active')->select(['id','uuid','restaurant_id','name','address','phone','email','category','description','post_code','status','avatar','website','online_order']);
+        $query  = Restaurant::orderBy('id', 'desc')->with('category_list','aval_slots','label_tags','about_label_tags','menus','photos','reviews',)->where('status', 'active')->select(['id','uuid','restaurant_id','name','address','phone','email','category','description','post_code','status','avatar','website','online_order']);
         if ($name) {
             $query->where('name', 'like', '%' . $name . '%');
         }
@@ -322,7 +322,7 @@ class AdminController extends Controller
 
     public function restaurant_single_info(Request $request,$uuid){
 
-        $restaurant =  Restaurant::where('uuid', $uuid)->with('category_list','aval_slots','label_tags','about_label_tags')->where('status', 'active')->select(['id','uuid','restaurant_id','name','address','phone','email','category','description','post_code','status','avatar','website','online_order'])->first();
+        $restaurant =  Restaurant::where('uuid', $uuid)->with('category_list','aval_slots','label_tags','about_label_tags','menus','photos','reviews',)->where('status', 'active')->select(['id','uuid','restaurant_id','name','address','phone','email','category','description','post_code','status','avatar','website','online_order'])->first();
         if (empty($restaurant)) {
             return response()->json([
                 'status' => false,
@@ -348,8 +348,6 @@ class AdminController extends Controller
         }
 
         $tabledata = Reservation::where([
-            ['start', '=', $request->start_time],
-            ['end', '=', $request->end_time],
             ['day', '=', $request->day],
             ['reservation_date', '=', $request->date],
             ['restaurant_id', '=', $restaurant->id]

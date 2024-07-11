@@ -55,6 +55,23 @@ class Restaurant extends Model
         return $this->hasMany(AboutTaq::class,'restaurant_id','id')->where('status','active')->select(['id','uuid','name','status','restaurant_id']);
     }
 
+    public function menus(){
+        return $this->hasMany(ResMenu::class,'restaurant_id','id')->with('menu_description','menu_category')->where('status','active');
+    }
+
+    public function photos(){
+        return $this->hasMany(Photo::class,'restaurant_id','id')->where('status','active')->with('photo_description')->select(['id','uuid','restaurant_id','avatar','status']);
+    }
+
+    public function reviews(){
+        return $this->hasMany(Review::class,'restaurant_id','id')->with('guest_informaion')->where('status','active');
+    }
+
+
+
+
+
+
 
 
     public function getAvailableSlots($day, $date,$interval)

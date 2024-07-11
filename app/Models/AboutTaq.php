@@ -10,7 +10,7 @@ use Spatie\Activitylog\LogOptions;
 
 class AboutTaq extends Model
 {
-    use HasFactory;
+    use HasFactory,LogsActivity;
 
     protected $fillable = [
         'uuid',
@@ -19,6 +19,11 @@ class AboutTaq extends Model
         'restaurant_id'
 
     ];
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults();
+    }
     protected static function boot()
     {
         parent::boot();
