@@ -48,11 +48,11 @@ class Restaurant extends Model
 
 
     public function label_tags(){
-        return $this->hasMany(LabelTaq::class,'restaurant_id','id')->where('status','active')->select(['id','uuid','name','status','restaurant_id']);
+        return $this->hasMany(LabelTag::class,'restaurant_id','id')->where('status','active')->select(['id','uuid','name','status','restaurant_id']);
     }
 
     public function about_label_tags(){
-        return $this->hasMany(AboutTaq::class,'restaurant_id','id')->where('status','active')->select(['id','uuid','name','status','restaurant_id']);
+        return $this->hasMany(AboutTag::class,'restaurant_id','id')->where('status','active')->select(['id','uuid','name','status','restaurant_id']);
     }
 
     public function menus(){

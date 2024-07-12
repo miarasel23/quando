@@ -7,10 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
-class LabelTaq extends Model
+
+class AboutTag extends Model
 {
     use HasFactory,LogsActivity;
-
 
     protected $fillable = [
         'uuid',
@@ -20,14 +20,10 @@ class LabelTaq extends Model
 
     ];
 
-
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults();
     }
-
-
-
     protected static function boot()
     {
         parent::boot();

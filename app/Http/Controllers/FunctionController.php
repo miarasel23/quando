@@ -38,8 +38,7 @@ class FunctionController extends Controller
     public function menu_create (Request $request)
     {
 
-
-        $validateUser = Validator::make($request->all(), [
+      $validateUser = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'description' => 'string|max:1200',
             'halal_name' => 'string|max:120',
@@ -115,7 +114,6 @@ class FunctionController extends Controller
         $validateUser = Validator::make($request->all(), [
             'uuid' => 'required|string',
             'name' => 'required|string|max:255',
-
             'description' => 'string|max:1200',
             'halal_name' => 'string|max:120',
             'category_uuid' => 'required|string',
@@ -309,7 +307,6 @@ class FunctionController extends Controller
             }
             $data->status = $request->status;
             $data->save();
-
             if(!empty($request->global_description)){
                 $section_description = SectionDescription::where('section', 'photo')->where('restaurant_id', $data->restaurant_id)->first();
                 if(!empty($section_description)){
@@ -387,7 +384,6 @@ class FunctionController extends Controller
             ], 401);
         }
        $rest = Restaurant::where('uuid', $request->rest_uuid)->first();
-
        $guest = GuestInformaion::where('uuid', $request->guest_uuid)->first();
        if(!empty($rest) && !empty($guest)){
            $data = Review::create([
