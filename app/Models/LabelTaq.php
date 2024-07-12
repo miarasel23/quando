@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
-class LabelTaq extends Model
+class LabelTag extends Model
 {
     use HasFactory,LogsActivity;
 

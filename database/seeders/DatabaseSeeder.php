@@ -37,16 +37,6 @@ class DatabaseSeeder extends Seeder
             'res_uuid' => Hash::make('password'),
             'user_type' => 'super_admin',
         ]);
-
-
-        User::factory()->create([
-            'name' => 'Super Admin',
-            'email' => 'superadmin@gmail.com',
-            'res_uuid' => Hash::make('password'),
-            'user_type' => 'super_admin',
-        ]);
-
-
         $menu_catergory = [
             'PAPADAM',
             'VEG STARTERS',
@@ -65,7 +55,7 @@ class DatabaseSeeder extends Seeder
             'DRINKS',
             'DESSERTS',
         ];
-        
+
         foreach ($menu_catergory as $menu_data) {
             MenuCatergory::create([
                 'name' => $menu_data,

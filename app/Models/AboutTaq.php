@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
-class AboutTaq extends Model
+class AboutTag extends Model
 {
     use HasFactory,LogsActivity;
 

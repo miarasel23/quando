@@ -10,8 +10,8 @@ use App\Models\FloorArea;
 use App\Models\Restaurant;
 use App\Models\Slot;
 use App\Models\TableMaster;
-use App\Models\LabelTaq;
-use App\Models\AboutTaq;
+use App\Models\LabelTag;
+use App\Models\AboutTag;
 use Auth;
 use Laravel\Sanctum\PersonalAccessToken;
 use  Illuminate\Support\Facades\DB;
@@ -380,7 +380,7 @@ class RestaurantController extends Controller
     }
 
 
-    public function label_taq_create(Request $request){
+    public function label_tag_create(Request $request){
         $validateUser = Validator::make($request->all(), [
             'rest_uuid' => 'required',
             'name' => 'required',
@@ -395,7 +395,7 @@ class RestaurantController extends Controller
         }
         $rest_data  = Restaurant::where('uuid', $request->rest_uuid)->first();
         if(!empty($rest_data)){
-            $data=LabelTaq::create([
+            $data=LabelTag::create([
                 'restaurant_id' => $rest_data->id,
                 'name' => $request->name,
                 'status' => $request->status,
@@ -415,7 +415,7 @@ class RestaurantController extends Controller
     }
 
 
-    public function label_taq_update(Request $request){
+    public function label_tag_update(Request $request){
         $validateUser = Validator::make($request->all(), [
             'rest_uuid' => 'required',
             'uuid' => 'required',
@@ -430,7 +430,7 @@ class RestaurantController extends Controller
             ], 401);
         }
         $rest_data  = Restaurant::where('uuid', $request->rest_uuid)->first();
-        $edit_data = LabelTaq::where('uuid', $request->uuid)->first();
+        $edit_data = LabelTag::where('uuid', $request->uuid)->first();
         if(!empty($edit_data) ){
             $edit_data->update([
                 'restaurant_id' => $rest_data->id,
@@ -451,10 +451,10 @@ class RestaurantController extends Controller
         }
     }
 
-    public function label_taq_info($rest_uuid){
+    public function label_tag_info($rest_uuid){
         $rest =  Restaurant::where('uuid', $rest_uuid)->first();
         if(!empty($rest)){
-            $data = LabelTaq::where('restaurant_id', $rest->id)->get();
+            $data = LabelTag::where('restaurant_id', $rest->id)->get();
             if(!empty($data)){
                 return response()->json([
                     'status' => true,
@@ -478,8 +478,8 @@ class RestaurantController extends Controller
     }
 
 
-    public function label_taq_delete($uuid){
-        $delete =  LabelTaq::where('uuid', $uuid)->delete();
+    public function label_tag_delete($uuid){
+        $delete =  LabelTag::where('uuid', $uuid)->delete();
         if(!empty($delete)){
         return response()->json([
             'status' => true,
@@ -505,7 +505,7 @@ class RestaurantController extends Controller
 
 
 
-    public function about_taq_create(Request $request){
+    public function about_tag_create(Request $request){
         $validateUser = Validator::make($request->all(), [
             'rest_uuid' => 'required',
             'name' => 'required',
@@ -520,14 +520,14 @@ class RestaurantController extends Controller
         }
         $rest_data  = Restaurant::where('uuid', $request->rest_uuid)->first();
         if(!empty($rest_data)){
-            $data=AboutTaq::create([
+            $data=AboutTag::create([
                 'restaurant_id' => $rest_data->id,
                 'name' => $request->name,
                 'status' => $request->status,
             ]);
             return response()->json([
                 'status' => true,
-                'message' => 'about taq created Successfully',
+                'message' => 'about tag created Successfully',
                 'data' => $data
             ], 200);
         }else{
@@ -540,7 +540,7 @@ class RestaurantController extends Controller
     }
 
 
-    public function about_taq_update(Request $request){
+    public function about_tag_update(Request $request){
         $validateUser = Validator::make($request->all(), [
             'rest_uuid' => 'required',
             'uuid' => 'required',
@@ -555,7 +555,7 @@ class RestaurantController extends Controller
             ], 401);
         }
         $rest_data  = Restaurant::where('uuid', $request->rest_uuid)->first();
-        $edit_data = AboutTaq::where('uuid', $request->uuid)->first();
+        $edit_data = AboutTag::where('uuid', $request->uuid)->first();
         if(!empty($edit_data)){
             $edit_data->update([
                 'restaurant_id' => $rest_data->id,
@@ -576,10 +576,10 @@ class RestaurantController extends Controller
         }
     }
 
-    public function about_taq_info($rest_uuid){
+    public function about_tag_info($rest_uuid){
         $rest =  Restaurant::where('uuid', $rest_uuid)->first();
         if(!empty($rest)){
-            $data = AboutTaq::where('restaurant_id', $rest->id)->get();
+            $data = AboutTag::where('restaurant_id', $rest->id)->get();
             if(!empty($data)){
                 return response()->json([
                     'status' => true,
@@ -604,8 +604,8 @@ class RestaurantController extends Controller
     }
 
 
-    public function about_taq_delete($uuid){
-        $delete =  AboutTaq::where('uuid', $uuid)->delete();
+    public function about_tag_delete($uuid){
+        $delete =  AboutTag::where('uuid', $uuid)->delete();
         if(!empty($delete)){
         return response()->json([
             'status' => true,

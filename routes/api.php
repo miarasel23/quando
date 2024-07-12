@@ -110,15 +110,15 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             Route::get('table-delete/{uuid}', [RestaurantController::class, 'table_delete']);
 
 
-            Route::post('label-taq-create', [RestaurantController::class, 'label_taq_create']);
-            Route::post('label-taq-update', [RestaurantController::class, 'label_taq_update']);
-            Route::get('label-taq-info/{rest_uuid}', [RestaurantController::class, 'label_taq_info']);
-            Route::get('label-taq-delete/{uuid}', [RestaurantController::class, 'label_taq_delete']);
+            Route::post('label-tag-create', [RestaurantController::class, 'label_tag_create']);
+            Route::post('label-tag-update', [RestaurantController::class, 'label_tag_update']);
+            Route::get('label-tag-info/{rest_uuid}', [RestaurantController::class, 'label_tag_info']);
+            Route::get('label-tag-delete/{uuid}', [RestaurantController::class, 'label_tag_delete']);
 
-            Route::post('about-taq-create', [RestaurantController::class, 'about_taq_create']);
-            Route::post('about-taq-update', [RestaurantController::class, 'about_taq_update']);
-            Route::get('about-taq-info/{rest_uuid}', [RestaurantController::class, 'about_taq_info']);
-            Route::get('about-taq-delete/{uuid}', [RestaurantController::class, 'about_taq_delete']);
+            Route::post('about-tag-create', [RestaurantController::class, 'about_tag_create']);
+            Route::post('about-tag-update', [RestaurantController::class, 'about_tag_update']);
+            Route::get('about-tag-info/{rest_uuid}', [RestaurantController::class, 'about_tag_info']);
+            Route::get('about-tag-delete/{uuid}', [RestaurantController::class, 'about_tag_delete']);
 
         });
 
