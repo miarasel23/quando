@@ -105,84 +105,83 @@ class AdminController extends Controller
 
     // ***************************************************** Restaurant ***********************************************
 
-
-
     public function restaurant_create(Request $request){
-            $validateUser = Validator::make($request->all(), [
-            'name' => 'required',
-            'email' => 'required|email|unique:restaurants',
-            'phone' => [
-                'required',
-                'unique:restaurants',
-                'regex:/^(\+?\d{1,3}[-.\s]?)?\d{10}$/', // Example regex for phone validation, adjust as necessary
-            ],
-            'address' => 'required',
-            'post_code' => 'required',
-            'created_by' => 'required',
-            'website' => 'nullable|url',
-            'avatar' => 'image|mimes:jpeg,png,jpg,svg|max:2048', // Validation rules for image
-        ]);
-        if ($validateUser->fails()) {
-            return response()->json([
-                'status' => false,
-                'errors' => $validateUser->errors()
-            ], 422);
+        if( in_array($request->params, ['update', 'info'])){
+            $old_rest = Restaurant::where('uuid', $request->uuid)->first();
         }
-
-
-        $restaurant = Restaurant::create([
-            'name' => $request['name'],
-            'email' => $request['email'],
-            'phone' => $request['phone'],
-            'address' => $request['address'],
-            'post_code' => $request['post_code'],
-            'avatar' => $request->hasFile('avatar') ? $this->verifyAndUpload('avatar',$request['avatar'], null, null) : null,
-            'description' => $request['description'],
-            'category' => $request['category'],
-            'restaurant_id' => '123',
-            'created_by' => $request['created_by'],
-            'website' => $request['website'],
-            'status' => 'active',
-        ]);
-        return response()->json([
-            'status' => true,
-            'message' => 'Restaurant Created Successfully',
-            'data' => $restaurant
-        ], 200);
-
-    }
-
-    public function restaurant_update(Request $request){
         $validateUser = Validator::make($request->all(), [
             'name' => 'required',
-            'email' => 'required|email|unique:restaurants,email,' . $request->id, // Allow updating current restaurant
-            'phone' => [
+            'email' =>  in_array($request->params, ['update']) ?
+            'required|email|unique:restaurants,email,' . $old_rest->id :
+            (in_array($request->params, ['info']) ?
+            'nullable' :
+            'required|email|unique:restaurants'),
+            'phone' =>  in_array($request->params, ['update']) ?  [
                 'required',
-                'unique:restaurants,phone,' . $request->id, // Allow updating current restaurant
-                'regex:/^(\+?\d{1,3}[-.\s]?)?\d{10}$/', // Example regex for phone validation, adjust as necessary
-            ],
-            'address' => 'required',
-            'post_code' => 'required',
-            'updated_by' => 'required',
-            'website' => 'nullable|url',
-            'avatar' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Validation rules for image
+                'unique:restaurants,phone,' . $old_rest->id,
+                'regex:/^(\+?\d{1,3}[-.\s]?)?\d{10}$/',
+            ]: (in_array($request->params, ['info']) ?
+            'nullable' : [
+                'required',
+                'unique:restaurants',
+                'regex:/^(\+?\d{1,3}[-.\s]?)?\d{10}$/' ,
+            ]),
+            'address' => in_array($request->params, ['info']) ? 'nullable' : 'required',
+            'params' => 'required',
+            'post_code' =>  in_array($request->params, ['info']) ? 'nullable' : 'required',
+            'created_by' =>   in_array($request->params, ['info']) ? 'nullable' : 'required',
+            'website' =>  in_array($request->params, ['info']) ? 'nullable': 'nullable|url',
+            'avatar' =>  in_array($request->params, ['info']) ? '' :'image|mimes:jpeg,png,jpg,svg|max:2048',
+            'uuid' => in_array($request->store_type, ['update', 'info']) ? 'required' : 'nullable',
         ]);
-
         if ($validateUser->fails()) {
             return response()->json([
                 'status' => false,
                 'errors' => $validateUser->errors()
             ], 422);
         }
-        // Find the restaurant to update
-        $restaurant = Restaurant::find($request->id);
+        if($request->params == 'update'){
+            $data =$this->restaurant_update($request);
+            return $data;
+        }elseif($request->params == 'create'){
+            $restaurant = Restaurant::create([
+                'name' => $request['name'],
+                'email' => $request['email'],
+                'phone' => $request['phone'],
+                'address' => $request['address'],
+                'post_code' => $request['post_code'],
+                'avatar' => $request->hasFile('avatar') ? $this->verifyAndUpload('avatar',$request['avatar'], null, null) : null,
+                'description' => $request['description'],
+                'category' => $request['category'],
+                'restaurant_id' => '123',
+                'created_by' => $request['created_by'],
+                'website' => $request['website'],
+                'status' => 'active',
+            ]);
+            return response()->json([
+                'status' => true,
+                'message' => 'Restaurant Created Successfully',
+                'data' => $restaurant
+            ], 200);
+        }elseif($request->params == 'info'){
+            $data = $this->restaurant_info($request->uuid);
+            return $data;
+        }else{
+            return response()->json([
+                'status' => false,
+                'message' => 'Invalid store type'
+            ], 422);
+        }
+    }
+
+    public function restaurant_update($request){
+        $restaurant = Restaurant::where('uuid', $request->uuid)->first();
         if (!$restaurant) {
             return response()->json([
                 'status' => false,
                 'message' => 'Restaurant not found'
             ], 404);
         }
-        // Update the restaurant with validated data
         $restaurant->name = $request->name;
         $restaurant->email = $request->email;
         $restaurant->phone = $request->phone;
@@ -246,9 +245,6 @@ class AdminController extends Controller
         }
     }
 
-
-
-
     public function category(){
         $category = Category::orderBy('id', 'desc')->with('restaurants')->select(['id','name'])->get();
         if ($category->count() == 0) {
@@ -264,9 +260,8 @@ class AdminController extends Controller
     }
 
     public function restaurant_list(Request $request){
-
         $perPage = $request->input('per_page', 10);
-        $restaurant = Restaurant::orderBy('id', 'desc')->with('category_list','aval_slots','label_tags','about_label_tags','menus','photos','reviews',)->where('status', 'active')->select(['id','uuid','restaurant_id','name','address','phone','email','category','description','post_code','status','avatar','website','online_order'])->paginate($perPage);
+        $restaurant = Restaurant::orderBy('id', 'desc')->with('category_list','aval_slots','label_tags','about_label_tags','photos','reviews',)->where('status', 'active')->select(['id','uuid','restaurant_id','name','address','phone','email','category','description','post_code','status','avatar','website','online_order'])->paginate($perPage);
         if ($restaurant->count() == 0) {
             return response()->json([
                 'status' => false,
@@ -282,27 +277,13 @@ class AdminController extends Controller
         $perPage = $request->input('per_page', 10);
         $name = $request->input('name');
         $postCode = $request->input('post_code');
-        $query  = Restaurant::orderBy('id', 'desc')->with('category_list','aval_slots','label_tags','about_label_tags','menus','photos','reviews',)->where('status', 'active')->select(['id','uuid','restaurant_id','name','address','phone','email','category','description','post_code','status','avatar','website','online_order']);
+        $query  = Restaurant::orderBy('id', 'desc')->with('category_list','aval_slots','label_tags','about_label_tags','photos','reviews',)->where('status', 'active')->select(['id','uuid','restaurant_id','name','address','phone','email','category','description','post_code','status','avatar','website','online_order']);
         if ($name) {
             $query->where('name', 'like', '%' . $name . '%');
         }
         if ($postCode) {
             $query->where('post_code', 'like', '%' . $postCode . '%');
         }
-        // if(!$name && !$postCode){
-        //     return response()->json([
-        //         'status' => false,
-        //         'data' => [],
-        //         'pagination' => [
-        //             'total' => 0,
-        //             'per_page' => $perPage,
-        //             'current_page' => 1,
-        //             'last_page' => 1,
-        //             'next_page_url' => null,
-        //             'prev_page_url' => null,
-        //         ]
-        //     ], 200);
-        // }
         $restaurants = $query->paginate($perPage);
         if ($restaurants->count() == 0) {
             return response()->json([
@@ -317,27 +298,84 @@ class AdminController extends Controller
     }
 
 
-
-
-
     public function restaurant_single_info(Request $request,$uuid){
-
-        $restaurant =  Restaurant::where('uuid', $uuid)->with('category_list','aval_slots','label_tags','about_label_tags','menus','photos','reviews',)->where('status', 'active')->select(['id','uuid','restaurant_id','name','address','phone','email','category','description','post_code','status','avatar','website','online_order'])->first();
+        $restaurant = Restaurant::where('uuid', $uuid)
+        ->with('category_list','label_tags','about_label_tags','menu_description','photo_description','reviews_description','menus.menu_category','photos','reviews','aval_slots')->where('status', 'active')->select(['id','uuid','restaurant_id','name','address','phone','email','category','description','post_code','status','avatar','website','online_order'])
+            ->where('status', 'active')
+            ->select(['id', 'uuid', 'restaurant_id', 'name', 'address', 'phone', 'email', 'category', 'description', 'post_code', 'status', 'avatar', 'website', 'online_order'])
+            ->first();
+        if ($restaurant->count() == 0) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Restaurant not found'
+            ], 404);
+        }
+        $groupedMenus = $restaurant->menus->groupBy('menu_category_id');
+        $categories = [];
+            foreach ($groupedMenus as $categoryId => $menus) {
+                $category = $menus->first()->menu_category;
+                $categories[] = [
+                    'id' => $category->id,
+                    'uuid' => $category->uuid,
+                    'name' => $category->name,
+                    'status' => $category->status,
+                    'created_at' => $category->created_at,
+                    'updated_at' => $category->updated_at,
+                    'menus' => $menus->map(function ($menu) {
+                        return [
+                            'id' => $menu->id,
+                            'uuid' => $menu->uuid,
+                            'name' => $menu->name,
+                            'description' => $menu->description,
+                            'halal_name' => $menu->halal_name,
+                            'restaurant_id' => $menu->restaurant_id,
+                            'menu_category_id' => $menu->menu_category_id,
+                            'price' => $menu->price,
+                            'price_symbol' => $menu->price_symbol,
+                            'status' => $menu->status,
+                            'created_at' => $menu->created_at,
+                            'updated_at' => $menu->updated_at
+                        ];
+                    })->toArray()
+                ];
+            }
+            $data = [
+                'id' => $restaurant->id,
+                'uuid' => $restaurant->uuid,
+                'restaurant_id' => $restaurant->restaurant_id,
+                'name' => $restaurant->name,
+                'address' => $restaurant->address,
+                'phone' => $restaurant->phone,
+                'email' => $restaurant->email,
+                'category' => $restaurant->category,
+                'description' => $restaurant->description,
+                'post_code' => $restaurant->post_code,
+                'status' => $restaurant->status,
+                'avatar' => $restaurant->avatar,
+                'website' => $restaurant->website,
+                'online_order' => $restaurant->online_order,
+                'label_tags' => $restaurant->label_tags,
+                'about_label_tags' => $restaurant->about_label_tags,
+                'menu_description' => $restaurant->menu_description,
+                'photo_description' => $restaurant->photo_description,
+                'reviews_description' => $restaurant->reviews_description,
+                'photo'=>$restaurant->photos,
+                'reviews' => $restaurant->reviews,
+                'aval_slots' => $restaurant->aval_slots,
+                'reviews_description' => $restaurant->reviews_description,
+                'categories' => $categories
+            ];
         if (empty($restaurant)) {
             return response()->json([
                 'status' => false,
                 'message' => 'Restaurant not found'
             ], 404);
         }
-
-
         $validateUser = Validator::make($request->all(), [
-
             'start_time' => 'string',
             'end_time' => 'string',
             'date' => 'string',
             'day'=>'string',
-
         ]);
         if ($validateUser->fails()) {
             return response()->json([
@@ -346,7 +384,6 @@ class AdminController extends Controller
                 'errors' => $validateUser->errors()
             ], 401);
         }
-
         $tabledata = Reservation::where([
             ['day', '=', $request->day],
             ['reservation_date', '=', $request->date],
@@ -354,7 +391,6 @@ class AdminController extends Controller
            ])
            ->whereNotIn('status', ['cancelled', 'completed'])
            ->get();
-
            $allTables = TableMaster::where('restaurant_id', $restaurant->id)->get();
             if (count($tabledata) > 0 && count($allTables) > 0) {
                 $reservedTableIds = $tabledata->pluck('table_master_id')->toArray();
@@ -364,17 +400,15 @@ class AdminController extends Controller
             } else {
                 $availableTables = $allTables;
             }
-
             if(count($availableTables) > 0){
                 $availableSlots = Slot::where('restaurant_id', $restaurant->id)->where('day',$request->day)->where('status','active')->select([
                     'interval_time' ])->first();
-
                     if(!empty($availableSlots)){
                         $availableSlots = $restaurant->getAvailableSlots($request->day , $request->date ,$availableSlots->interval_time);
                     }
                     return response()->json([
                         'status' => true,
-                        'data' => $restaurant,
+                        'data' => $data,
                         'available_slots' => $availableSlots != null ? $availableSlots: [] ,
                     ], 200);
             }else{

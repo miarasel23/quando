@@ -55,17 +55,35 @@ class Restaurant extends Model
         return $this->hasMany(AboutTag::class,'restaurant_id','id')->where('status','active')->select(['id','uuid','name','status','restaurant_id']);
     }
 
+
+
+    public function menu_description(){
+        return $this->hasOne(SectionDescription::class,'restaurant_id','id')->where('section','=','menu')->select(['id','restaurant_id','description','section']);
+
+    }
+
+    public function photo_description(){
+        return $this->hasOne(SectionDescription::class,'restaurant_id','id')->where('section','=','photo')->select(['id','restaurant_id','description','section']);
+    }
+
+    public function reviews_description(){
+        return $this->hasOne(SectionDescription::class,'restaurant_id','id')->where('section','=','review')->select(['id','restaurant_id','description','section']);
+    }
+
     public function menus(){
-        return $this->hasMany(ResMenu::class,'restaurant_id','id')->with('menu_description','menu_category')->where('status','active');
+        return $this->hasMany(ResMenu::class,'restaurant_id','id')->with('menu_category')->where('status','active');
     }
 
     public function photos(){
-        return $this->hasMany(Photo::class,'restaurant_id','id')->where('status','active')->with('photo_description')->select(['id','uuid','restaurant_id','avatar','status']);
+        return $this->hasMany(Photo::class,'restaurant_id','id')->where('status','active')->select(['id','uuid','restaurant_id','avatar','status']);
     }
 
     public function reviews(){
         return $this->hasMany(Review::class,'restaurant_id','id')->with('guest_informaion')->where('status','active');
     }
+
+
+
 
 
 
