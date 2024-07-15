@@ -19,58 +19,64 @@ class UserController extends Controller
 
     public function user_create(Request $request)
     {
-        $validateUser = Validator::make($request->all(), [
-            'name' => 'required',
-            'email' => 'required|email|unique:users',
-            'res_uuid' => 'required',
-            'user_type' => 'required',
-            'phone' => [
 
-                'unique:users',
-                'regex:/^(\+?\d{1,3}[-.\s]?)?\d{10}$/', // Example regex for phone validation, adjust as necessary
-            ],
-            'password' => 'required'
-        ]);
-        if ($validateUser->fails()) {
-            return response()->json([
-                'status' => false,
-                'message' => 'validation error',
-                'errors' => $validateUser->errors()
-            ], 401);
+        if(in_array( $request->params,['update', 'info'])){
+            $old_user = User::where('uuid', $request->uuid)->first();
         }
-        $user = User::create([
-            'name' => $request->name,
-            'res_uuid' => $request->res_uuid,
-            'user_type' => $request->user_type,
-            'phone' => $request->phone,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
-        return response()->json([
-            'status' => true,
-            'message' => 'User Created Successfully',
-            'data' => $user
-        ], 200);
+        $validateUser = Validator::make($request->all(), [
+                'name' =>  in_array($request->params, [ 'info']) ? 'nullable' : 'required',
+                'email' => in_array($request->params, ['update']) ?
+                'required|email|unique:restaurants,email,' . $old_user->id :
+                (in_array($request->params, ['info']) ?
+                'nullable' :'required|email|unique:restaurants'),
+                'res_uuid' =>  in_array($request->params, [ 'info']) ? 'nullable' :  'required',
+                'user_type' =>  in_array($request->params, [ 'info']) ? 'nullable' :  'required',
+                'params' => 'required',
+                'phone' =>  in_array($request->params, ['update']) ?  [
+                    'required',
+                    'unique:restaurants,phone,' . $old_user->id,
+                    'regex:/^(\+?\d{1,3}[-.\s]?)?\d{10}$/',
+                ]: (in_array($request->params, ['info']) ?
+                'nullable' : [
+                    'required',
+                    'unique:restaurants',
+                    'regex:/^(\+?\d{1,3}[-.\s]?)?\d{10}$/' ,
+                ]),
+                'password' =>  in_array($request->params, [ 'info']) ? 'nullable' : (  in_array($request->params, [ 'update']) ? 'required' : 'nullable'),
+            ]);
+            if ($validateUser->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'validation error',
+                    'errors' => $validateUser->errors()
+                ], 401);
+            }
+            if(in_array($request->params, ['update'])){
+                $data = $this->user_update($request);
+                return $data;
+            }
+            if(in_array($request->params, ['info'])){
+                $data = $this->user_info($request->uuid);
+                return $data;
+            };
+            if(in_array($request->params, ['create'])){
+                $user = User::create([
+                    'name' => $request->name,
+                    'res_uuid' => $request->res_uuid,
+                    'user_type' => $request->user_type,
+                    'phone' => $request->phone,
+                    'email' => $request->email,
+                    'password' => Hash::make($request->password),
+                ]);
+                return response()->json([
+                    'status' => true,
+                    'message' => 'User Created Successfully',
+                    'data' => $user
+                ], 200);
+            }
     }
-
     public function user_update(Request $request)
     {
-        $validateUser = Validator::make($request->all(), [
-            'name' => 'required',
-            'email' => 'required|email|unique:users,email,' . $request->id,
-            'res_uuid' => 'required',
-            'phone' => [
-                'unique:users',
-                'regex:/^(\+?\d{1,3}[-.\s]?)?\d{10}$/', // Example regex for phone validation, adjust as necessary
-            ],
-        ]);
-        if ($validateUser->fails()) {
-            return response()->json([
-                'status' => false,
-                'message' => 'validation error',
-                'errors' => $validateUser->errors()
-            ], 401);
-        }
         $user = User::where('uuid', $request->uuid)->first();
         if (!empty($user)) {
             $user->update([
@@ -112,21 +118,82 @@ class UserController extends Controller
 
 
 
-    public function profile($uuid){
-        $user = GuestInformaion::where('uuid', $uuid)->with('guest_reservation')->first();
-        if (!empty($user) && $user->status == 'active') {
-            return response()->json([
-                'status' => true,
-                'message' => 'User Info',
-                'data' => $user
-            ], 200);
-        } else {
+
+
+    public function guest_register(Request $request){
+        if(in_array($request->params, ['update', 'info'])){
+            $old_guest = GuestInformaion::where('uuid', $request->uuid)->first();
+        }
+        $validateUser = Validator::make($request->all(), [
+            'first_name' => 'required',
+            'last_name' => 'required',
+            'phone' =>  in_array($request->params, ['update']) ?  [
+                'required',
+                'unique:restaurants,phone,' . $old_guest->id,
+                'regex:/^(\+?\d{1,3}[-.\s]?)?\d{10}$/',
+            ]: (in_array($request->params, ['info']) ?
+            'nullable' : [
+                'required',
+                'unique:restaurants',
+                'regex:/^(\+?\d{1,3}[-.\s]?)?\d{10}$/' ,
+            ]),
+            'email' => in_array($request->params, ['update']) ?
+                'required|email|unique:restaurants,email,' . $old_guest->id :
+                (in_array($request->params, ['info']) ?
+                'nullable' :'required|email|unique:restaurants'),
+            'address' => 'required',
+            'city' => 'required',
+            'country' => 'required',
+            'post_code' => 'required',
+            'password' =>  in_array($request->params, [ 'info']) ? 'nullable' : (  in_array($request->params, [ 'update']) ? 'required' : 'nullable'),
+
+        ]);
+        if ($validateUser->fails()) {
             return response()->json([
                 'status' => false,
-                'message' => 'User Not Found'
-            ], 404);
+                'message' => 'validation error',
+                'errors' => $validateUser->errors()
+            ], 401);
+        };
+        if (in_array($request->params, ['update'])) {
+            $old_guest->update([
+                'first_name' => $request->first_name,
+                'last_name' => $request->last_name,
+                'phone' => $request->phone,
+                'email' => $request->email,
+                'address' => $request->address,
+                'city' => $request->city,
+                'country' => $request->country,
+                'post_code' => $request->post_code,
+                'password' => Hash::make($request->password),
+                'status' => 'inactive'
+            ]);
         }
-    }
+        if (in_array($request->params, ['create'])) {
+            $user = GuestInformaion::create([
+                'first_name' => $request->first_name,
+                'last_name' => $request->last_name,
+                'phone' => $request->phone,
+                'email' => $request->email,
+                'address' => $request->address,
+                'city' => $request->city,
+                'country' => $request->country,
+                'post_code' => $request->post_code,
+                'password' => Hash::make($request->password),
+                'status' => 'inactive'
+            ]);
+        }
+        if(in_array($request->params, ['info'])){
+            $data = $this->profile($request->uuid);
+            return $data;
+        }
+        return response()->json([
+            'status' => true,
+            'message' => 'Register Successfully',
+            'data' => $request->params == 'create' ? $user : $old_guest
+        ], 200);
+       }
+
 
     public function profile_update(Request $request){
         $user = GuestInformaion::where('uuid', $request->uuid)->first();
@@ -183,67 +250,22 @@ class UserController extends Controller
     }
    }
 
-   public function guest_register(Request $request){
-    $user = GuestInformaion::where('email', $request->email)->first();
-    $validateUser = Validator::make($request->all(), [
-        'first_name' => 'required',
-        'last_name' => 'required',
-        'phone' => [
-            'required',
-            $user != null ? Rule::unique('guest_informaions')->ignore($user->id) : 'unique:guest_informaions,phone',
-            'regex:/^(\+?\d{1,3}[-.\s]?)?\d{10}$/', // Example regex for phone validation, adjust as necessary
-        ],
-        'email'=> 'required|email',
-        $user != null ? Rule::unique('guest_informaions')->ignore($user->id) : 'unique:guest_informaions,email',
-        'address' => 'required',
-        'city' => 'required',
-        'country' => 'required',
-        'post_code' => 'required',
-        'password' => 'required',
-
-    ]);
-    if ($validateUser->fails()) {
+   public function profile($uuid){
+    $user = GuestInformaion::where('uuid', $uuid)->with('guest_reservation')->first();
+    if (!empty($user) && $user->status == 'active') {
+        return response()->json([
+            'status' => true,
+            'message' => 'User Info',
+            'data' => $user
+        ], 200);
+    } else {
         return response()->json([
             'status' => false,
-            'message' => 'validation error',
-            'errors' => $validateUser->errors()
-        ], 401);
+            'message' => 'User Not Found'
+        ], 404);
     }
+}
 
-    if(empty($user)){
-        $user = GuestInformaion::create([
-            'first_name' => $request->first_name,
-            'last_name' => $request->last_name,
-            'phone' => $request->phone,
-            'email' => $request->email,
-            'address' => $request->address,
-            'city' => $request->city,
-            'country' => $request->country,
-            'post_code' => $request->post_code,
-            'password' => Hash::make($request->password),
-            'status' => 'inactive'
-        ]);
-    }else{
-        $user->update([
-            'first_name' => $request->first_name,
-            'last_name' => $request->last_name,
-            'phone' => $request->phone,
-            'email' => $request->email,
-            'address' => $request->address,
-            'city' => $request->city,
-            'country' => $request->country,
-            'post_code' => $request->post_code,
-            'password' => Hash::make($request->password),
-            'status' => 'inactive'
-        ]);
-    }
-
-    return response()->json([
-        'status' => true,
-        'message' => 'Register Successfully',
-        'data' => $user
-    ], 200);
-   }
 
 
 

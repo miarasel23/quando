@@ -37,19 +37,22 @@ class FunctionController extends Controller
 
     public function menu_create (Request $request)
     {
-
+        if(in_array($request->params, ['update', 'delete'])){
+            $old_menu = ResMenu::where('uuid', $request->uuid)->first();
+        }
       $validateUser = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'description' => 'string|max:1200',
-            'halal_name' => 'string|max:120',
-            'category_uuid' => 'required|string',
-            'rest_uuid' => 'required|string',
-            'price' => 'required|numeric',
-            'symbol' => 'required|string',
-            'status' => 'required|string',
-            'global_description' => 'string|max:1200',
+            'name' =>  in_array($request->params, ['update','create']) ? 'required|string|max:255' : 'nullable|string|max:255',
+            'description' => in_array($request->params, ['update','create']) ? 'nullable|string|max:1200' : 'nullable|string|max:1200',
+            'halal_name' => in_array($request->params, ['update','create']) ? 'nullable|string|max:255' : 'nullable|string|max:255',
+            'category_uuid' => in_array($request->params, ['update','create']) ? 'required|exists:menu_catergories,uuid' : 'nullable|string|max:255',
+            'rest_uuid' =>in_array($request->params, ['update','create','info']) ? 'required|exists:restaurants,uuid' : 'nullable|string|max:255',
+            'price' =>   in_array($request->params, ['update','create']) ? 'required|numeric' : 'nullable|numeric|max:255',
+            'symbol' => in_array($request->params, ['update','create']) ? 'required|string|max:255' : 'nullable|string|max:255',
+            'status' =>  in_array($request->params, ['update','create']) ? 'required|string|max:255' : 'nullable|string|max:255',
+            'global_description' =>  in_array($request->params, ['update','create']) ? 'required|string|max:1200' : 'nullable|string|max:1200',
+            'uuid' =>  in_array($request->params, ['update','delete']) ? 'required|exists:res_menus,uuid' : 'nullable|string|max:255',
+            'params' => 'required',
         ]);
-
         if ($validateUser->fails()) {
             return response()->json([
                 'status' => false,
@@ -57,49 +60,63 @@ class FunctionController extends Controller
                 'errors' => $validateUser->errors()
             ], 401);
         }
-
-    $rest_data = Restaurant::where('uuid', $request->rest_uuid)->where('status', 'active')->first();
-    if(!empty($rest_data)){
-        $menu_catergory = MenuCatergory::where('uuid', $request->category_uuid)->where('status', 'active')->first();
-        if(!empty( $request->global_description)){
-            $global_descrip = SectionDescription::where('section', 'menu')->where('restaurant_id', $rest_data->id)->first();
-            if(!empty($global_descrip)){
-                $global_descrip->update([
-                    'description' => $request->global_description,
-
-                ]);
-            }else{
-                SectionDescription::create([
-                    'description' => $request->global_description,
-                    'section' => 'menu',
+        if(in_array($request->params, ['update'])){
+            $data = $this->menu_update($request);
+            return $data;
+        }elseif(in_array($request->params, ['info'])){
+            $data = $this->menu_info($request->rest_uuid);
+            return $data;
+        }elseif(in_array($request->params, ['delete'])){
+           $data = $this->menu_delete($request->uuid);
+           return $data;
+        }elseif(in_array($request->params, ['create'])){
+        $rest_data = Restaurant::where('uuid', $request->rest_uuid)->where('status', 'active')->first();
+        if(!empty($rest_data)){
+            $menu_catergory = MenuCatergory::where('uuid', $request->category_uuid)->where('status', 'active')->first();
+            if(!empty( $request->global_description)){
+                $global_descrip = SectionDescription::where('section', 'menu')->where('restaurant_id', $rest_data->id)->first();
+                if(!empty($global_descrip)){
+                    $global_descrip->update([
+                        'description' => $request->global_description,
+                    ]);
+                }else{
+                    SectionDescription::create([
+                        'description' => $request->global_description,
+                        'section' => 'menu',
+                        'restaurant_id' => $rest_data->id,
+                    ]);
+                }
+            }
+            if(!empty($menu_catergory)){
+                $data = ResMenu::create([
+                    'name' => $request->name,
                     'restaurant_id' => $rest_data->id,
+                    'description' => $request->description,
+                    'halal_name' => $request->halal_name,
+                    'menu_catergory_id' => $menu_catergory->id,
+                    'price' => $request->price,
+                    'price_symbol' => $request->symbol,
+                    'status' => $request->status,
                 ]);
-            }
-        }
-        if(!empty($menu_catergory)){
-            $data = ResMenu::create([
-                'name' => $request->name,
-                'restaurant_id' => $rest_data->id,
-                'description' => $request->description,
-                'halal_name' => $request->halal_name,
-                'menu_catergory_id' => $menu_catergory->id,
-                'price' => $request->price,
-                'price_symbol' => $request->symbol,
-                'status' => $request->status,
-            ]);
 
-            return response()->json([
-                'status' => true,
-                'message' => 'Menu Created Successfully',
-                'data' => $data
-            ], 200);
-            }else{
                 return response()->json([
-                    'status' => false,
-                    'message' => 'Menu Catergory Not Found',
-                    'data' => []
+                    'status' => true,
+                    'message' => 'Menu Created Successfully',
+                    'data' => $data
                 ], 200);
-            }
+                }else{
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Menu Catergory Not Found',
+                        'data' => []
+                    ], 200);
+                }}else{
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Restaurant Not Found',
+                        'data' => []
+                    ], 200);
+                }
         }else{
             return response()->json([
                 'status' => false,
@@ -111,26 +128,7 @@ class FunctionController extends Controller
 
      public function menu_update (Request $request)
     {
-        $validateUser = Validator::make($request->all(), [
-            'uuid' => 'required|string',
-            'name' => 'required|string|max:255',
-            'description' => 'string|max:1200',
-            'halal_name' => 'string|max:120',
-            'category_uuid' => 'required|string',
-            'rest_uuid' => 'required|string',
-            'price' => 'required|numeric',
-            'symbol' => 'required|string',
-            'status' => 'required|string',
-            'global_description' => 'string|max:1200',
-        ]);
 
-        if ($validateUser->fails()) {
-            return response()->json([
-                'status' => false,
-                'message' => 'validation error',
-                'errors' => $validateUser->errors()
-            ], 401);
-        }
         $rest_data = Restaurant::where('uuid', $request->rest_uuid)->where('status', 'active')->first();
         if(!empty($rest_data)){
             $menu_catergory = MenuCatergory::where('uuid', $request->category_uuid)->where('status', 'active')->first();
@@ -233,49 +231,68 @@ class FunctionController extends Controller
             ], 200);
         }
     }
-
-
     public function rest_photo(Request $request){
-        $validateUser = Validator::make($request->all(), [
-            'rest_uuid' => 'required',
-            'avatar' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'global_description' => 'nullable|max:255',
-            'status'=>'required'
-        ]);
-        if ($validateUser->fails()) {
-            return response()->json([
-                'status' => false,
-                'message' => 'validation error',
-                'errors' => $validateUser->errors()
-            ], 401);
-        }
+            if(in_array($request->params, ['update','delete'])){
+            $old_photo = Photo::where('uuid', $request->uuid)->first();
+            }
+            $validateUser = Validator::make($request->all(), [
+                'rest_uuid' => in_array($request->params, ['update','create','info']) ? 'required:exists:restaurants,uuid' : 'nullable|string',
+                'avatar' =>  in_array($request->params, ['update','create']) ? 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048' : 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'global_description' =>  in_array($request->params, ['update','create']) ? 'nullable|string' : 'nullable|max:255',
+                'status'=> in_array($request->params, ['update','create']) ? 'nullable|string' : 'nullable|max:120',
+                'params'=> 'required|string',
+                'uuid' =>  in_array($request->params, ['update','delete']) ? 'required:exists:photos,uuid' : 'nullable',
+            ]);
+            if ($validateUser->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'validation error',
+                    'errors' => $validateUser->errors()
+                ], 401);
+            }
         $rest_data = Restaurant::where('uuid', $request->rest_uuid)->where('status', 'active')->first();
         if(!empty($rest_data)){
-            $data = Photo::create([
-                'avatar' => $request->hasFile('avatar') ? $this->verifyAndUpload('avatar',$request['avatar'], null, null) : null,
-                'restaurant_id' => $rest_data->id,
-                'status'=> $request->status
-            ]);
-
-            if(!empty($request->global_description)){
-                $section_description = SectionDescription::where('section', 'photo')->where('restaurant_id', $rest_data->id)->first();
-                if(!empty($section_description)){
-                    $section_description->description = $request->global_description;
-                    $section_description->save();
-                }else{
-                    SectionDescription::create([
-                        'description' => $request->global_description,
-                        'section' => 'photo',
-                        'restaurant_id' => $rest_data->id,
-                    ]);
+                if(in_array($request->params, ['create'])){
+                $data = Photo::create([
+                    'avatar' => $request->hasFile('avatar') ? $this->verifyAndUpload('avatar',$request['avatar'], null, null) : null,
+                    'restaurant_id' => $rest_data->id,
+                    'status'=> $request->status
+                ]);
+                if(!empty($request->global_description)){
+                    $section_description = SectionDescription::where('section', 'photo')->where('restaurant_id', $rest_data->id)->first();
+                    if(!empty($section_description)){
+                        $section_description->description = $request->global_description;
+                        $section_description->save();
+                    }else{
+                        SectionDescription::create([
+                            'description' => $request->global_description,
+                            'section' => 'photo',
+                            'restaurant_id' => $rest_data->id,
+                        ]);
+                    }
                 }
-            }
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Photo Added Successfully',
+                    'data' => $data
+                ], 200);
 
-            return response()->json([
-                'status' => true,
-                'message' => 'Photo Added Successfully',
-                'data' => $data
-            ], 200);
+            }elseif(in_array($request->params, ['update'])){
+                $data = $this->rest_photo_update($request);
+                return $data;
+            }elseif(in_array($request->params, ['delete'])){
+                $data = $this->rest_photo_delete($request->uuid);
+                return $data;
+            }elseif(in_array($request->params, ['info'])){
+                $data = $this->rest_photo_info($rest_data->uuid);
+                return $data;
+            }else{
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Restaurant Not Found',
+                    'data' => []
+                ], 200);
+            }
         }else{
             return response()->json([
                 'status' => false,
@@ -284,22 +301,12 @@ class FunctionController extends Controller
             ], 200);
         }
 
+
+
     }
 
     public function rest_photo_update(Request $request){
-        $validateUser = Validator::make($request->all(), [
-            'uuid' => 'required',
-            'global_description' => 'nullable|max:255',
-            'avatar' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'status'=>'required'
-        ]);
-        if ($validateUser->fails()) {
-            return response()->json([
-                'status' => false,
-                'message' => 'validation error',
-                'errors' => $validateUser->errors()
-            ], 401);
-        }
+
         $data = Photo::where('uuid', $request->uuid)->first();
         if(!empty($data)){
             if($request->hasFile('avatar')){

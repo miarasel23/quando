@@ -21,12 +21,15 @@ class RestaurantController extends Controller
 {
      public function floor_area_create(Request $request){
 
+        if(in_array($request->params, ['update', 'info'])){
+            $old_floor = FloorArea::where('uuid', $request->uuid)->first();
+        }
         $validateUser = Validator::make($request->all(), [
-            'name' => 'required',
-            'rest_uuid' => 'required',
-
+            'name' => in_array($request->params,['update']) ?'required' : (in_array($request->params, ['info']) ? 'nullable':'nullable') ,
+            'rest_uuid' =>  in_array($request->params,['update']) ?'required' : (in_array($request->params, ['info']) ? 'nullable':'nullable') ,
+            'params' => 'required',
+            'uuid' =>  in_array($request->params,['update']) ?'required' : (in_array($request->params, ['info','create']) ? 'nullable':'nullable') ,
         ]);
-
         if ($validateUser->fails()) {
             return response()->json([
                 'status' => false,
@@ -35,9 +38,13 @@ class RestaurantController extends Controller
             ], 401);
         }
         $rest_data  = Restaurant::where('uuid', $request->rest_uuid)->first();
-
-
-        if(!empty($rest_data)){
+        if(in_array($request->params, ['update'])){
+            $data = $this->floor_area_update($request);
+            return $data;
+        }elseif(in_array($request->params, ['info'])){
+            $data = $this->floor_area_info($request->rest_uuid);
+            return $data;
+        }elseif(in_array($request->params, ['create'])){
             $data = FloorArea::create([
                 'name' => $request->name,
                 'restaurant_id' => $rest_data->id,
@@ -47,29 +54,19 @@ class RestaurantController extends Controller
                 'message' => 'User Created Successfully',
                 'data' => $data
             ], 200);
+        }elseif(in_array($request->params, ['delete'])){
+           $data = $this->floor_area_delete($request->uuid);
+           return $data;
         }else{
             return response()->json([
                 'status' => false,
-                'message' => 'Restaurant Not Found',
+                'message' => 'Something went wrong',
                 'data' => []
             ], 200);
         }
      }
 
      public function floor_area_update(Request $request){
-        $validateUser = Validator::make($request->all(), [
-            'name' => 'required',
-            'rest_uuid' => 'required',
-            'uuid' => 'required',
-
-        ]);
-        if ($validateUser->fails()) {
-            return response()->json([
-                'status' => false,
-                'message' => 'validation error',
-                'errors' => $validateUser->errors()
-            ], 401);
-        }
         $rest_data  = Restaurant::where('uuid', $request->rest_uuid)->first();
         if(!empty($rest_data)){
            FloorArea::where('uuid', $request->uuid)->update([
@@ -89,8 +86,6 @@ class RestaurantController extends Controller
             ], 200);
         }
      }
-
-
      public function floor_area_info( $uuid){
         $rest =  Restaurant::where('uuid', $uuid)->first();
         if(!empty($rest)){
@@ -134,6 +129,8 @@ class RestaurantController extends Controller
             ], 200);
         }
      }
+
+
 
      public function slot_create(Request $request){
         $validateUser = Validator::make($request->all(), [
@@ -227,20 +224,23 @@ class RestaurantController extends Controller
 
      public function table_create(Request $request){
 
-
+        if(in_array($request->params, ['update','info','delete'])){
+            $old_table = TableMaster::where('uuid', $request->uuid)->first();
+        }
         $validateUser = Validator::make($request->all(), [
-            'rest_uuid' => 'required',
-            'table_id' => 'required',
-            'table_name' => 'required',
-            'capacity' => 'required',
-            'description' => 'max:1200',
-            'min_seats' => 'required',
-            'max_seats' => 'required',
-            'reservation_online' => 'required',
-            'floor_uuid' => 'required',
-            'status' => 'required',
+            'rest_uuid' => in_array($request->params, ['info','delete','update']) ? 'required|exists:restaurants,uuid' : 'nullable',
+            'table_id' => in_array($request->params, ['update','create']) ? 'required|numeric' : 'nullable',
+            'table_name' => in_array($request->params,  ['update','create']) ? 'required|string' : 'nullable',
+            'capacity' => in_array($request->params, ['update','create']) ? 'required|numeric' : 'nullable',
+            'description' => in_array($request->params, ['update','create']) ? 'nullable|string' : 'nullable',
+            'min_seats' => in_array($request->params, ['update','create']) ? 'required|string' : 'nullable',
+            'max_seats' => in_array($request->params,  ['update','create']) ? 'required|string' : 'nullable',
+            'reservation_online' => in_array($request->params, ['update','create']) ? 'required|string' : 'nullable',
+            'floor_uuid' => in_array($request->params,  ['update','create']) ? 'required|exists:floor_areas,uuid' : 'nullable',
+            'params'=>'required|string',
+            'uuid'=>in_array($request->params,  ['update','create']) ? 'required|string' : 'nullable',
+            'status' =>in_array($request->params,  ['update','create']) ? 'required|string' : 'nullable',
         ]);
-
         if ($validateUser->fails()) {
             return response()->json([
                 'status' => false,
@@ -248,28 +248,44 @@ class RestaurantController extends Controller
                 'errors' => $validateUser->errors()
             ], 401);
         }
-
         $rest_data  = Restaurant::where('uuid', $request->rest_uuid)->first();
         $floor = FloorArea::where('uuid', $request->floor_uuid)->first();
         if(!empty($rest_data) && !empty($floor)){
+            if(in_array($request->params, ['create'])){
+                $data = TableMaster::create([
+                    'restaurant_id' => $rest_data->id,
+                    'table_id' => $request->table_id,
+                    'table_name' => $request->table_name,
+                    'capacity' => $request->capacity,
+                    'description' => $request->description,
+                    'min_seats' => $request->min_seats,
+                    'max_seats' => $request->max_seats,
+                    'reservation_online' => $request->reservation_online,
+                    'floor_area_id' => $floor->id,
+                    'status' => $request->status,
+                ]);
+                return response()->json([
+                    'status' => true,
+                    'message' => 'table Created Successfully',
+                    'data' => $data
+                ], 200);
 
-            $data = TableMaster::create([
-                'restaurant_id' => $rest_data->id,
-                'table_id' => $request->table_id,
-                'table_name' => $request->table_name,
-                'capacity' => $request->capacity,
-                'description' => $request->description,
-                'min_seats' => $request->min_seats,
-                'max_seats' => $request->max_seats,
-                'reservation_online' => $request->reservation_online,
-                'floor_area_id' => $floor->id,
-                'status' => $request->status,
-            ]);
+        }elseif(in_array($request->params, ['update'])){
+            $data = $this->table_update($request);
+            return $data;
+        }elseif(in_array($request->params, ['delete'])){
+            $data = $this->table_delete($request->uuid);
+            return $data;
+        }elseif(in_array($request->params, ['info'])){
+            $data = $this->table_info($rest_data->uuid);
+            return $data;
+        }else{
             return response()->json([
-                'status' => true,
-                'message' => 'table Created Successfully',
-                'data' => $data
+                'status' => false,
+                'message' => 'Invalid Request',
+                'data' => []
             ], 200);
+        }
         }else{
             return response()->json([
                 'status' => false,
@@ -281,26 +297,6 @@ class RestaurantController extends Controller
 
      public function table_update(Request $request){
 
-        $validateUser = Validator::make($request->all(), [
-            'rest_uuid' => 'required',
-            'table_id' => 'required',
-            'table_name' => 'required',
-            'capacity' => 'required',
-            'description' => 'max:1200',
-            'min_seats' => 'required',
-            'max_seats' => 'required',
-            'reservation_online' => 'required',
-            'floor_uuid' => 'required',
-            'status' => 'required',
-            'uuid' => 'required',
-        ]);
-        if ($validateUser->fails()) {
-            return response()->json([
-                'status' => false,
-                'message' => 'validation error',
-                'errors' => $validateUser->errors()
-            ], 401);
-        }
         $rest_data  = Restaurant::where('uuid', $request->rest_uuid)->first();
         $floor = FloorArea::where('uuid', $request->floor_uuid)->first();
 
@@ -379,12 +375,16 @@ class RestaurantController extends Controller
         }
     }
 
-
     public function label_tag_create(Request $request){
+        if(in_array($request->params, ['update','delete','info'])){
+            $old_label_tag = LabelTag::where('uuid', $request->uuid)->first();
+        };
         $validateUser = Validator::make($request->all(), [
-            'rest_uuid' => 'required',
-            'name' => 'required',
-            'status' => 'required',
+            'rest_uuid' => in_array($request->params, ['create','update']) ? 'required:exists:restaurants,uuid' : 'nullable',
+            'name' => in_array($request->params, ['create','update']) ? 'required' : 'nullable',
+            'status' =>in_array($request->params, ['create','update']) ? 'required' : 'nullable',
+            'uuid' => in_array($request->params, ['update','delete']) ? 'required:exists:label_tags,uuid' : 'nullable',
+            'params'=>'required:string'
         ]);
         if ($validateUser->fails()) {
             return response()->json([
@@ -395,16 +395,33 @@ class RestaurantController extends Controller
         }
         $rest_data  = Restaurant::where('uuid', $request->rest_uuid)->first();
         if(!empty($rest_data)){
-            $data=LabelTag::create([
-                'restaurant_id' => $rest_data->id,
-                'name' => $request->name,
-                'status' => $request->status,
-            ]);
-            return response()->json([
-                'status' => true,
-                'message' => 'label created Successfully',
-                'data' => $data
-            ], 200);
+            if(in_array($request->params, ['update'])){
+                $data = $this->label_tag_update($request);
+                return $data;
+            }elseif(in_array($request->params, ['create'])){
+                $data=LabelTag::create([
+                    'restaurant_id' => $rest_data->id,
+                    'name' => $request->name,
+                    'status' => $request->status,
+                ]);
+                return response()->json([
+                    'status' => true,
+                    'message' => 'label created Successfully',
+                    'data' => $data
+                ], 200);
+            }elseif(in_array($request->params, ['delete'])){
+                $data = $this->label_tag_delete($request->uuid);
+                return $data;
+            }elseif(in_array($request->params, ['info'])){
+                $data = $this->label_tag_info($rest_data->uuid);
+                return $data;
+            }else{
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Invalid Params',
+                    'data' => []
+                ], 200);
+            }
         }else{
             return response()->json([
                 'status' => false,
@@ -506,10 +523,16 @@ class RestaurantController extends Controller
 
 
     public function about_tag_create(Request $request){
+
+        if(in_array($request->params, ['update','delete','info'])){
+            $data =AboutTag::where('uuid', $request->uuid)->first();
+        }
         $validateUser = Validator::make($request->all(), [
-            'rest_uuid' => 'required',
-            'name' => 'required',
-            'status' => 'required',
+            'rest_uuid' => in_array($request->params, ['update','info']) ? 'required:exists:restaurants,uuid' : 'required',
+            'name' =>   in_array($request->params, ['update','create']) ? 'required|string' : 'nullable',
+            'status' => in_array($request->params, ['update','create']) ? 'required:string' : 'nullable',
+            'uuid'=> in_array($request->params, ['update','delete']) ? 'required:exists:about_tags,uuid' : 'nullable',
+            'params'=> 'required:string'
         ]);
         if ($validateUser->fails()) {
             return response()->json([
@@ -520,16 +543,36 @@ class RestaurantController extends Controller
         }
         $rest_data  = Restaurant::where('uuid', $request->rest_uuid)->first();
         if(!empty($rest_data)){
-            $data=AboutTag::create([
-                'restaurant_id' => $rest_data->id,
-                'name' => $request->name,
-                'status' => $request->status,
-            ]);
-            return response()->json([
-                'status' => true,
-                'message' => 'about tag created Successfully',
-                'data' => $data
-            ], 200);
+
+
+            if($request->params == 'update'){
+                $data =$this->about_tag_update($request);
+                return $data;
+            }elseif($request->params == 'delete'){
+                $data = $this->about_tag_delete($request->uuid);
+                return $data;
+            }elseif($request->params == 'info'){
+                $data = $this->about_tag_info($rest_data->uuid);
+                return $data;
+            }elseif($request->params == 'create'){
+                $data=AboutTag::create([
+                    'restaurant_id' => $rest_data->id,
+                    'name' => $request->name,
+                    'status' => $request->status,
+                ]);
+                return response()->json([
+                    'status' => true,
+                    'message' => 'about tag created Successfully',
+                    'data' => $data
+                ], 200);
+            }else{
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Something went wrong',
+                    'data' => []
+                ], 200);
+            }
+
         }else{
             return response()->json([
                 'status' => false,
@@ -541,19 +584,6 @@ class RestaurantController extends Controller
 
 
     public function about_tag_update(Request $request){
-        $validateUser = Validator::make($request->all(), [
-            'rest_uuid' => 'required',
-            'uuid' => 'required',
-            'name' => 'required',
-            'status' => 'required',
-        ]);
-        if ($validateUser->fails()) {
-            return response()->json([
-                'status' => false,
-                'message' => 'validation error',
-                'errors' => $validateUser->errors()
-            ], 401);
-        }
         $rest_data  = Restaurant::where('uuid', $request->rest_uuid)->first();
         $edit_data = AboutTag::where('uuid', $request->uuid)->first();
         if(!empty($edit_data)){
