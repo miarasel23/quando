@@ -297,7 +297,6 @@ class AdminController extends Controller
         ], 200);
     }
 
-
     public function restaurant_single_info(Request $request,$uuid){
         $restaurant = Restaurant::where('uuid', $uuid)
         ->with('category_list','label_tags','about_label_tags','menu_description','photo_description','reviews_description','menus.menu_category','photos','reviews','aval_slots')->where('status', 'active')->select(['id','uuid','restaurant_id','name','address','phone','email','category','description','post_code','status','avatar','website','online_order'])
