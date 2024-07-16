@@ -124,6 +124,7 @@ class UserController extends Controller
         if(in_array($request->params, ['update', 'info'])){
             $old_guest = GuestInformaion::where('uuid', $request->uuid)->first();
         }
+
         $validateUser = Validator::make($request->all(), [
             'first_name' => 'required',
             'last_name' => 'required',
@@ -171,6 +172,21 @@ class UserController extends Controller
             ]);
         }
         if (in_array($request->params, ['create'])) {
+            $user = GuestInformaion::where('email', $request->email)->first();
+            if (!empty($old)) {
+                $user->update([
+                    'first_name' => $request->first_name,
+                    'last_name' => $request->last_name,
+                    'phone' => $request->phone,
+                    'email' => $request->email,
+                    'address' => $request->address,
+                    'city' => $request->city,
+                    'country' => $request->country,
+                    'post_code' => $request->post_code,
+                    'password' => Hash::make($request->password),
+                    'status' => 'inactive'
+                ]);
+            }else{
             $user = GuestInformaion::create([
                 'first_name' => $request->first_name,
                 'last_name' => $request->last_name,
@@ -183,6 +199,8 @@ class UserController extends Controller
                 'password' => Hash::make($request->password),
                 'status' => 'inactive'
             ]);
+            }
+
         }
         if(in_array($request->params, ['info'])){
             $data = $this->profile($request->uuid);
