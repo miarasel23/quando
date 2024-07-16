@@ -20,9 +20,9 @@ return new class extends Migration
             $table->string('password');
             $table->string('phone')->unique();
             $table->string('address')->nullable();
-            $table->string('post_code');
-            $table->string('city');
-            $table->string('country');
+            $table->string('post_code')->nullable();
+            $table->string('city')->nullable();
+            $table->string('country')->nullable();
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->rememberToken();
             $table->timestamps();
