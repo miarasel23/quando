@@ -192,5 +192,100 @@ class ReservationController extends Controller
             ], 404);
         }
     }
+    public function reservation_for_restaurant(Request $request){
+        if (in_array($request->params, ['cancel', 'checkin', 'checkout'])) {
+            $data = Reservation::where('uuid', $request->uuid)->first();
+        }
+        $validateUser = Validator::make($request->all(), [
+            'rest_uuid' => in_array($request->params, ['info']) ? 'required|exists:restaurants,uuid' : 'required',
+            'checkin_time' => in_array($request->params, ['checkin']) ? 'required' : 'nullable',
+            'checkout_time' => in_array($request->params, ['checkout']) ? 'required' : 'nullable',
+            'uuid' => in_array($request->params, ['checkin', 'checkout', 'cancel']) ? 'required|exists:reservations,uuid' : 'nullable',
+            'params' => 'required|string'
+        ]);
+        if ($validateUser->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'validation error',
+                'errors' => $validateUser->errors()
+            ], 401);
+        }
+        if (in_array($request->params, ["info"])) {
+            $perPage = $request->input('per_page', 10);
+            $rest_data = Restaurant::where('uuid', $request->rest_uuid)->first();
+
+            if ($rest_data != null) {
+                $reservation = Reservation::where('restaurant_id', $rest_data->id)
+                    // ->whereHas('guest_information', function ($query) {
+                    //     $query->where('status', 'active');
+                    // })
+                    ->with('guest_information', 'table_master', 'restaurant')
+                    ->paginate($perPage);
+
+                if ($reservation != null) {
+                    return response()->json([
+                        'status' => true,
+                        'message' => 'Reservation Info',
+                        'data' => $reservation
+                    ], 200);
+                } else {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Reservation Not Found',
+                    ], 404);
+                }
+            }
+        } elseif (in_array($request->params, ["checkin"])) {
+            if ($data != null && $data->status == 'pending') {
+                $data->check_in_time = $request->checkin_time;
+                $data->status = 'checkin';
+                $data->noted = $request->note;
+                $data->save();
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Reservation Checked In Successfully',
+                    'data' => $data
+                ], 200);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Reservation Not Found',
+                ], 404);
+            }
+        } elseif (in_array($request->params, ['checkout'])) {
+            if ($data != null && $data->status == 'checkin') {
+                $data->check_out_time = $request->checkout_time;
+                $data->status = 'completed';
+                $data->save();
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Reservation Checked Out Successfully',
+                    'data' => $data
+                ], 200);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Reservation Not Found',
+                ], 404);
+            }
+        }elseif(in_array($request->params, ['cancel'])){
+            if ($data != null && $data->status == 'checkin' || $data->status == 'pending') {
+                $data->status = 'cancelled';
+                $data->noted = $request->note;
+                $data->save();
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Reservation Cancelled Successfully',
+                    'data' => $data
+                ], 200);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Reservation Not Found',
+                ], 404);
+            }
+        }
+    }
 
 }

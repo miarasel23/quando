@@ -25,8 +25,10 @@ return new class extends Migration
             $table->string('start')->nullable();
             $table->string('end')->nullable();
             $table->string('day');
+            $table->string('check_in_time')->nullable();
+            $table->string('check_out_time')->nullable();
             $table->string('number_of_people')->nullable();
-            $table->enum('status', ['pending', 'cancelled', 'confirmed', 'completed','hold'])->default('pending');
+            $table->enum('status', ['pending','check_in','check_out','cancelled', 'confirmed', 'completed','hold'])->default('pending');
             $table->Integer('updated_by')->nullable();
             $table->String('noted')->nullable();
             $table->timestamps();
