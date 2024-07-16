@@ -210,7 +210,6 @@ class ReservationController extends Controller
                 'errors' => $validateUser->errors()
             ], 401);
         }
-
         if (in_array($request->params, ["info"])) {
             $perPage = $request->input('per_page', 10);
             $rest_data = Restaurant::where('uuid', $request->rest_uuid)->first();

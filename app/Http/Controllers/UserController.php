@@ -172,7 +172,7 @@ class UserController extends Controller
             ]);
         }
         if (in_array($request->params, ['create'])) {
-            $user = GuestInformaion::where('email', $request->email)->first();
+            $user = GuestInformaion::where('email', $request->email)->orWhere('phone', $request->phone)->first();
             if (!empty($user)) {
                 $user->update([
                     'first_name' => $request->first_name,
