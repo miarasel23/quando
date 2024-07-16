@@ -145,6 +145,7 @@ class UserController extends Controller
             'city' => 'required',
             'country' => 'required',
             'post_code' => 'required',
+            'params' => 'required',
             'password' =>  in_array($request->params, [ 'info']) ? 'nullable' : (  in_array($request->params, [ 'update']) ? 'required' : 'nullable'),
 
         ]);

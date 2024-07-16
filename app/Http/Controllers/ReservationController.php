@@ -88,8 +88,14 @@ class ReservationController extends Controller
     public function reservation_book(Request $request)
     {
         $validateUser = Validator::make($request->all(), [
-            'reservation_uuid' => 'required',
-            'guest_id' => 'integer',
+            'reservation_uuid' => 'required|exists:reservations,uuid',
+            'guest_id' => 'integer|exists:guest_informaions,id',
+            'rest_uuid' => 'required|exists:restaurants,uuid',
+            'start_time' => 'required',
+            'end_time' => 'required',
+            'date' => 'required',
+            'day'=>'required',
+            'number_of_people' => 'required',
             'status'=>'required'
         ]);
         if ($validateUser->fails()) {
@@ -103,7 +109,14 @@ class ReservationController extends Controller
         if($reservation != null){
             $reservation->update([
                 'status' => 'pending',
-                'guest_information_id' => $request->guest_id
+                'guest_information_id' => $request->guest_id,
+                'reservation_time' => $request->start_time,
+                'table_master_id' => $reservation->table_master_id,
+                'start' => $request->start_time,
+                'end' => $request->end_time,
+                'reservation_date' => $request->date,
+                'number_of_people' => $request->number_of_people,
+                'day' => $request->day,
 
             ]);
             return response()->json([
