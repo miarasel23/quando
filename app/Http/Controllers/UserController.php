@@ -142,10 +142,10 @@ class UserController extends Controller
                 'required|email|unique:restaurants,email,' . $old_guest->id :
                 (in_array($request->params, ['info']) ?
                 'nullable' :'required|email|unique:restaurants'),
-            'address' => 'required',
-            'city' => 'required',
-            'country' => 'required',
-            'post_code' => 'required',
+            'address' => 'nullable|string',
+            'city' => 'nullable|string',
+            'country' => 'nullable|string',
+            'post_code' => 'nullable|string',
             'params' => 'required',
             'password' =>  in_array($request->params, [ 'info']) ? 'nullable' : (  in_array($request->params, [ 'update']) ? 'required' : 'nullable'),
 
