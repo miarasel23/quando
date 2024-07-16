@@ -33,6 +33,8 @@ Route::prefix('v1/user/')->group(function () {
         Route::get('reservation-removed', [ReservationController::class, 'reservation_removed']);
         Route::get('reservation-info/{uuid}', [ReservationController::class, 'reservation_info']);
 
+        Route::get('reservation-for-restaurant', [ReservationController::class, 'reservation_for_restaurant']);
+
     });
 
 });

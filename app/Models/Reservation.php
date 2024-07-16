@@ -23,6 +23,8 @@ class Reservation extends Model
         'end',
         'number_of_people',
         'status',
+        'check_in_time',
+        'check_out_time',
         'day',
         'updated_by',
     ];
