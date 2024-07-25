@@ -24,7 +24,7 @@ class UserController extends Controller
             $old_user = User::where('uuid', $request->uuid)->first();
         }
         $validateUser = Validator::make($request->all(), [
-                'name' =>  in_array($request->params, [ 'info']) ? 'nullable' : 'required',
+                'name' =>  in_array($request->params, ['info']) ? 'nullable' : 'required',
                 'email' => in_array($request->params, ['update']) ?
                 'required|email|unique:restaurants,email,' . $old_user->id :
                 (in_array($request->params, ['info']) ?
