@@ -33,7 +33,7 @@ Route::prefix('v1/user/')->group(function () {
         Route::get('reservation-removed', [ReservationController::class, 'reservation_removed']);
         Route::get('reservation-info/{uuid}', [ReservationController::class, 'reservation_info']);
 
-        Route::get('reservation-for-restaurant', [ReservationController::class, 'reservation_for_restaurant']);
+
 
     });
 
@@ -54,6 +54,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             Route::get('profile/{uuid}', [UserController::class, 'profile']);
             Route::post('profile-update', [UserController::class, 'profile_update']);
         });
+
+
+        Route::get('reservation-for-restaurant', [ReservationController::class, 'reservation_for_restaurant']);
 
 
         Route::prefix('restaurant-function')->group(function () {
