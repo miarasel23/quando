@@ -56,7 +56,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         });
 
 
-        Route::get('reservation-for-restaurant', [ReservationController::class, 'reservation_for_restaurant']);
+
 
 
         Route::prefix('restaurant-function')->group(function () {
@@ -80,6 +80,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
         Route::prefix('admin')->group(function () {
             Route::post('restaurants', [AdminController::class, 'restaurant_create']);
+
         });
         Route::prefix('restaurant')->group(function () {
             Route::post('users', [UserController::class, 'user_create']);
@@ -89,6 +90,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             Route::post('tables', [RestaurantController::class, 'table_create']);
             Route::post('label-tags', [RestaurantController::class, 'label_tag_create']);
             Route::post('about-tags', [RestaurantController::class, 'about_tag_create']);
+            Route::get('reservation-for-restaurant', [ReservationController::class, 'reservation_for_restaurant']);
         });
 
 
