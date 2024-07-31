@@ -219,7 +219,7 @@ class ReservationController extends Controller
                     // ->whereHas('guest_information', function ($query) {
                     //     $query->where('status', 'active');
                     // })
-                    ->with('guest_information', 'table_master', 'restaurant')
+                    ->with('guest_information', 'table_master', 'restaurant')->orderBy('id', 'desc')
                     ->paginate($perPage);
 
                 if ($reservation != null) {
