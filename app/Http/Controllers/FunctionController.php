@@ -237,7 +237,7 @@ class FunctionController extends Controller
             }
             $validateUser = Validator::make($request->all(), [
                 'rest_uuid' => in_array($request->params, ['update','create','info']) ? 'required:exists:restaurants,uuid' : 'nullable|string',
-                'avatar' =>  in_array($request->params, ['update','create']) ? 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048' : 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'avatar' =>  in_array($request->params, ['update','create']) ? 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048' : 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
                 'global_description' =>  in_array($request->params, ['update','create']) ? 'nullable|string' : 'nullable|max:255',
                 'status'=> in_array($request->params, ['update','create']) ? 'nullable|string' : 'nullable|max:120',
                 'params'=> 'required|string',
