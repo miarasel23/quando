@@ -33,6 +33,7 @@ class ReservationController extends Controller
             'number_of_people' => 'required',
             'status' => 'required',
             'uuid' =>  in_array($request->params, ['update']) ? 'required|exists:reservations,uuid' : 'nullable|string|max:255',
+            'params' => 'required',
         ]);
         if ($validateUser->fails()) {
             return response()->json([
@@ -63,7 +64,8 @@ class ReservationController extends Controller
         } else {
             $availableTables = $allTables;
         }
-        if(count($availableTables) > 0){
+
+        if(count($availableTables) > 0 && in_array($request->params, ['create'])){
             $user = Reservation::create([
                 'restaurant_id' => $rest_data->id,
                 'user_id' =>$request->user_uuid != null ? $user_data->id :null,
@@ -81,7 +83,7 @@ class ReservationController extends Controller
                 'message' => 'Reservation Hold Successfully',
                 'data' => $user
             ], 200);
-        }elseif(isset($old_reservation) && !empty($old_reservation)){
+        }elseif(isset($old_reservation) && !empty($old_reservation) && in_array($request->params, ['update'])){
             $old_reservation->update([
                 'start' => $request->start_time,
                 'end' => $request->end_time,
