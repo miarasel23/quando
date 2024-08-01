@@ -19,6 +19,10 @@ class ReservationController extends Controller
 {
     public function time_hold(Request $request)
     {
+
+        if(in_array($request->params, ['update'])){
+            $old_reservation = Reservation::where('uuid', $request->uuid)->where('status', 'hold')->first();
+        }
         $validateUser = Validator::make($request->all(), [
             'user_uuid' => 'string',
             'rest_uuid' => 'required',
@@ -28,6 +32,7 @@ class ReservationController extends Controller
             'day'=>'required',
             'number_of_people' => 'required',
             'status' => 'required',
+            'uuid' =>  in_array($request->params, ['update']) ? 'required|exists:reservations,uuid' : 'nullable|string|max:255',
         ]);
         if ($validateUser->fails()) {
             return response()->json([
@@ -76,12 +81,28 @@ class ReservationController extends Controller
                 'message' => 'Reservation Hold Successfully',
                 'data' => $user
             ], 200);
-            }else{
-                return response()->json([
-                    'status' => false,
-                    'message' => 'No Tables Available',
-                ], 401);
-            }
+        }elseif(isset($old_reservation) && !empty($old_reservation)){
+            $old_reservation->update([
+                'start' => $request->start_time,
+                'end' => $request->end_time,
+                'reservation_date' => $request->date,
+                'number_of_people' => $request->number_of_people,
+                'reservation_time' => $request->start_time,
+                'day' => $request->day,
+            ]);
+            return response()->json([
+                'status' => true,
+                'message' => 'Reservation Hold Successfully',
+                'data' => $old_reservation
+            ], 200);
+        }
+
+        else{
+            return response()->json([
+                'status' => false,
+                'message' => 'No Tables Available',
+            ], 401);
+        }
     }
 
 
