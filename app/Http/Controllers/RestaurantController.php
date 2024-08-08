@@ -238,7 +238,7 @@ class RestaurantController extends Controller
             'reservation_online' => in_array($request->params, ['update','create']) ? 'required|string' : 'nullable',
             'floor_uuid' => in_array($request->params,  ['update','create']) ? 'required|exists:floor_areas,uuid' : 'nullable',
             'params'=>'required|string',
-            'uuid'=>in_array($request->params,  ['update','create']) ? 'required|string' : 'nullable',
+            'uuid'=>in_array($request->params,  ['update']) ? 'required|string' : 'nullable',
             'status' =>in_array($request->params,  ['update','create']) ? 'required|string' : 'nullable',
         ]);
         if ($validateUser->fails()) {
@@ -277,7 +277,7 @@ class RestaurantController extends Controller
             $data = $this->table_delete($request->uuid);
             return $data;
         }elseif(in_array($request->params, ['info'])){
-            $data = $this->table_info($rest_data->uuid);
+            $data = $this->table_info($rest_data->uuid,$floor->id);
             return $data;
         }else{
             return response()->json([
@@ -328,11 +328,11 @@ class RestaurantController extends Controller
         }
      }
 
-     public function table_info($rest_uuid){
+     public function table_info($rest_uuid,$floor_id){
         $rest =  Restaurant::where('uuid', $rest_uuid)->first();
 
         if(!empty($rest)){
-            $data = TableMaster::where('restaurant_id', $rest->id)->get();
+            $data = TableMaster::where('restaurant_id', $rest->id)->where('floor_area_id', $floor_id)->orderBy('id','desc')->get();
             if(!empty($data)){
                 return response()->json([
                     'status' => true,
