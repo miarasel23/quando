@@ -136,11 +136,22 @@ class RestaurantController extends Controller
         $validateUser = Validator::make($request->all(), [
             'day' => 'required',
             'rest_uuid' => 'required',
-            'slot_start' => 'required',
-            'slot_end' => 'required',
+            'slot_start' => ['required', 'date_format:H:i', 'after_or_equal:00:00', 'before_or_equal:24:00'],
+            'slot_end' => [
+                'required',
+                'date_format:H:i',
+                'after_or_equal:00:00',
+                'before_or_equal:24:00',
+                'different:slot_start',
+                function($attribute, $value, $fail) use ($request) {
+                    if (strtotime($value) <= strtotime($request->slot_start)) {
+                        $fail('The ' . $attribute . ' must be greater than slot_start.');
+                    }
+                }
+            ],
             'interval_time' => 'required|numeric',
             'status' => 'required',
-        ]);
+                ]);
         if ($validateUser->fails()) {
             return response()->json([
                 'status' => false,
@@ -149,8 +160,15 @@ class RestaurantController extends Controller
             ], 401);
         }
         $rest_data  = Restaurant::where('uuid', $request->rest_uuid)->first();
-        if(!empty($rest_data)){
-            $old = Slot::where('day', $request->day)->where('restaurant_id', $rest_data->id)->first();
+        if (!empty($rest_data)) {
+            $old = Slot::where('day', $request->day)
+                       ->where('restaurant_id', $rest_data->id)
+                       ->where('slot_start', '<=', $request->slot_end)
+                       ->where('slot_end', '>=', $request->slot_start)
+                       ->first();
+
+
+
             if(!empty($old)){
                  $old->update([
                     'history' => null,
@@ -195,23 +213,29 @@ class RestaurantController extends Controller
 
 
      public function slot_info( $uuid){
-        $rest =  Restaurant::where('uuid', $uuid)->first();
-        if(!empty($rest)){
-            $data = Slot::where('restaurant_id', $rest->id)->where('status','=','active')->get();
-            if(!empty($data)){
+        $rest = Restaurant::where('uuid', $uuid)->first();
+
+        if (!empty($rest)) {
+            $data = Slot::where('restaurant_id', $rest->id)
+                        ->where('status', 'active')
+                        ->orderBy('day')->orderBy('slot_end') // Optional: to ensure slots are ordered by day
+                        ->get()
+                        ->groupBy('day');  // Group the slots by day
+
+            if ($data->isNotEmpty()) {
                 return response()->json([
                     'status' => true,
                     'message' => 'Slot Info',
                     'data' => $data
                 ]);
-            }else{
+            } else {
                 return response()->json([
                     'status' => false,
                     'message' => 'Slot Not Found',
                     'data' => []
                 ], 200);
             }
-        }else{
+        } else {
             return response()->json([
                 'status' => false,
                 'message' => 'Restaurant Not Found',

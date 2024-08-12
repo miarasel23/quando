@@ -110,7 +110,7 @@ class AdminController extends Controller
             $old_rest = Restaurant::where('uuid', $request->uuid)->first();
         }
         $validateUser = Validator::make($request->all(), [
-            'name' => 'required',
+            'name' =>  in_array($request->params, ['info']) ?'nullable':'required',
             'email' =>  in_array($request->params, ['update']) ?
             'required|email|unique:restaurants,email,' . $old_rest->id :
             (in_array($request->params, ['info']) ?
@@ -129,10 +129,11 @@ class AdminController extends Controller
             'address' => in_array($request->params, ['info']) ? 'nullable' : 'required',
             'params' => 'required',
             'post_code' =>  in_array($request->params, ['info']) ? 'nullable' : 'required',
-            'created_by' =>   in_array($request->params, ['info']) ? 'nullable' : 'required',
+            'created_by' =>   in_array($request->params, ['info','update']) ? 'nullable' : 'required',
             'website' =>  in_array($request->params, ['info']) ? 'nullable': 'nullable|url',
             'avatar' =>  in_array($request->params, ['info']) ? '' :'image|mimes:jpeg,png,jpg,svg|max:2048',
             'uuid' => in_array($request->store_type, ['update', 'info']) ? 'required' : 'nullable',
+            'status' =>  in_array($request->params, ['info']) ?'nullable':'required',
         ]);
         if ($validateUser->fails()) {
             return response()->json([
@@ -156,7 +157,7 @@ class AdminController extends Controller
                 'restaurant_id' => '123',
                 'created_by' => $request['created_by'],
                 'website' => $request['website'],
-                'status' => 'active',
+                'status' => $request['status'],
             ]);
             return response()->json([
                 'status' => true,
@@ -191,6 +192,7 @@ class AdminController extends Controller
         $restaurant->post_code = $request->post_code;
         $restaurant->website = $request->website;
         $restaurant->updated_by = $request->updated_by;
+        $restaurant->status = $request->status;
         if($request->hasFile('avatar')){
             $restaurant->avatar =  $this->updateImage('avatar',$request->avatar,  $restaurant->avatar,null, null);
         }
