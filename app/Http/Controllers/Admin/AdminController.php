@@ -275,6 +275,22 @@ class AdminController extends Controller
             'data' => $restaurant
         ], 200);
     }
+
+
+    public function restaurant_list_for_admin(Request $request){
+        $perPage = $request->input('per_page', 10);
+        $restaurant = Restaurant::orderBy('id', 'desc')->with('category_list','aval_slots','label_tags','about_label_tags','photos','reviews',)->select(['id','uuid','restaurant_id','name','address','phone','email','category','description','post_code','status','avatar','website','online_order'])->paginate($perPage);
+        if ($restaurant->count() == 0) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Restaurant not found'
+            ], 404);
+        }
+        return response()->json([
+            'status' => true,
+            'data' => $restaurant
+        ], 200);
+    }
     public function restaurant_search_list(Request $request){
         $perPage = $request->input('per_page', 10);
         $name = $request->input('name');

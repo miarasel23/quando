@@ -80,6 +80,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
         Route::prefix('admin')->group(function () {
             Route::post('restaurants', [AdminController::class, 'restaurant_create']);
+            Route::get('/restaurant-for-admin',[AdminController::class,'restaurant_list_for_admin']);
 
         });
         Route::prefix('restaurant')->group(function () {
