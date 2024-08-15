@@ -317,10 +317,27 @@ class AdminController extends Controller
 
     public function restaurant_single_info(Request $request,$uuid){
         $restaurant = Restaurant::where('uuid', $uuid)
-        ->with('category_list','label_tags','about_label_tags','menu_description','photo_description','reviews_description','menus.menu_category','photos','reviews','slots')->where('status', 'active')->select(['id','uuid','restaurant_id','name','address','phone','email','category','description','post_code','status','avatar','website','online_order'])
-            ->where('status', 'active')
-            ->select(['id', 'uuid', 'restaurant_id', 'name', 'address', 'phone', 'email', 'category', 'description', 'post_code', 'status', 'avatar', 'website', 'online_order'])
-            ->first();
+        ->with([
+            'category_list',
+            'label_tags',
+            'about_label_tags',
+            'menu_description',
+            'photo_description',
+            'reviews_description',
+            'menus.menu_category',
+            'photos',
+            'reviews',
+            'aval_slots' => function ($query) {
+                $query->where('status', 'active')
+                    ->orderBy('day')
+                    ->orderBy('slot_end')
+                    ->select(['id', 'uuid', 'restaurant_id', 'day', 'slot_start', 'slot_end']);
+            }
+        ])
+        ->where('status', 'active')
+        ->select(['id', 'uuid', 'restaurant_id', 'name', 'address', 'phone', 'email', 'category', 'description', 'post_code', 'status', 'avatar', 'website', 'online_order'])
+        ->first();
+
         if ($restaurant->count() == 0) {
             return response()->json([
                 'status' => false,
@@ -378,7 +395,7 @@ class AdminController extends Controller
                 'reviews_description' => $restaurant->reviews_description,
                 'photo'=>$restaurant->photos,
                 'reviews' => $restaurant->reviews,
-                'aval_slots' => $restaurant->aval_slots,
+                'aval_slots' =>   $restaurant->aval_slots->groupBy('day'),
                 'reviews_description' => $restaurant->reviews_description,
                 'categories' => $categories
             ];
@@ -401,6 +418,9 @@ class AdminController extends Controller
                 'errors' => $validateUser->errors()
             ], 401);
         }
+
+
+
         $tabledata = Reservation::where([
             ['day', '=', $request->day],
             ['reservation_date', '=', $request->date],
