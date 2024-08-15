@@ -130,7 +130,7 @@ class UserController extends Controller
                 ], 401);
             }
         $user= User::where('uuid', $request->user_uuid)->where('res_uuid', $request->rest_uuid)->first();
-        if (!empty($user) && $user->status == 'active' && $user->user_type == 'admin') {
+        if (!empty($user) && $user->status == 'active' && $user->user_type == 'admin'  or $user->user_type == 'super_admin') {
             $user_staf = User::where('res_uuid', $request->rest_uuid)->get();
             return response()->json([
                 'status' => true,
