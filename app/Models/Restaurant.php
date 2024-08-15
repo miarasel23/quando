@@ -43,14 +43,7 @@ class Restaurant extends Model
 
 
 
-    public function slots()
-    {
-        return $this->aval_slots()
-        ->orderBy('day')
-        ->orderBy('slot_end') // Optional: to ensure slots are ordered by day and slot_end
-        ->get()
-        ->groupBy('day');
-    }
+   
 
 
     public function slots_booked()
