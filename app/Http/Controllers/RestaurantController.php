@@ -245,6 +245,40 @@ class RestaurantController extends Controller
      }
 
 
+     public function slot_delete($rest_uuid, $day) {
+        // Find the restaurant by UUID
+        $rest = Restaurant::where('uuid', $rest_uuid)->first();
+
+        if ($rest) {
+            // Retrieve the slots for the specific restaurant and day
+            $slots = Slot::where('restaurant_id', $rest->id)
+                         ->where('day', $day)
+                         ->get();
+
+            if ($slots->isNotEmpty()) {
+                // Delete the retrieved slots
+                Slot::where('restaurant_id', $rest->id)
+                    ->where('day', $day)
+                    ->delete();
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Slots Deleted Successfully'
+                ]);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Slots Not Found'
+                ]);
+            }
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'Restaurant Not Found'
+            ]);
+        }
+    }
+
 
      public function table_create(Request $request){
 

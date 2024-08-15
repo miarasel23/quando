@@ -43,7 +43,7 @@ class Restaurant extends Model
 
 
 
-   
+
 
 
     public function slots_booked()
@@ -97,18 +97,74 @@ class Restaurant extends Model
 
 
 
-    public function getAvailableSlots($day, $date,$interval)
+    // public function getAvailableSlots($day, $date,$interval)
+    // {
+    //     $intervalTime = $interval; // default to 15 minutes if not provided
+    //      $slots = $this->aval_slots()->where('day', $day)->where('status', '=', 'active')->get();
+    //      foreach ($slots as $slot) {
+    //         $startTime = Carbon::parse( $slot->slot_start); // 9:00 AM
+    //         $endTime =  Carbon::parse( $slot->slot_end); // 12:00 AM (midnight)
+
+    //         // Calculate total duration in minutes
+    //         $totalDuration = $startTime->diffInMinutes($endTime);
+    //         // Calculate the number of intervals
+    //         $numberOfIntervals = $totalDuration / $intervalTime;
+    //         // Get all booked slots for the given day and date
+    //         $bookedSlots = DB::table('reservations')
+    //             ->where('day', $day)
+    //             ->where('reservation_date', $date)
+    //             ->whereNotIn('status', ['completed', 'cancelled'])
+    //             ->select('start', 'end')
+    //             ->get();
+    //         $availableSlots = collect();
+    //         for ($i = 0; $i < $numberOfIntervals; $i++) {
+    //             $slotStart = $startTime->copy()->addMinutes($i * $intervalTime);
+    //             $slotEnd = $slotStart->copy()->addMinutes($intervalTime);
+    //             $isAvailable = true;
+    //             foreach ($bookedSlots as $bookedSlot) {
+    //                 $bookedStart = Carbon::parse($bookedSlot->start);
+    //                 $bookedEnd = Carbon::parse($bookedSlot->end);
+
+    //                 if ($slotStart->lt($bookedEnd) && $slotEnd->gt($bookedStart)) {
+    //                     $isAvailable = false;
+    //                     break;
+    //                 }
+    //             }
+    //             if ($isAvailable) {
+    //                 $availableSlots->push([
+    //                     'start' => $slotStart->format('H:i:s'),
+    //                     'end' => $slotEnd->format('H:i:s')
+    //                 ]);
+    //             }
+    //         }
+    //         // Calculate total available minutes
+    //         $totalAvailableMinutes = $availableSlots->count() * $intervalTime;
+    //         return $availableSlots;
+    //      }
+
+
+
+    // }
+
+
+
+    public function getAvailableSlots($day, $date, $interval)
     {
-        $intervalTime = $interval; // default to 15 minutes if not provided
-         $slots = $this->aval_slots()->where('day', $day)->where('status', '=', 'active')->get();
-         foreach ($slots as $slot) {
-            $startTime = Carbon::parse( $slot->slot_start); // 9:00 AM
-            $endTime =  Carbon::parse( $slot->slot_end); // 12:00 AM (midnight)
+        $intervalTime = $interval; // Default to the provided interval
+
+        // Get all available slots for the given day
+        $slots = $this->aval_slots()->where('day', $day)->where('status', '=', 'active')->get();
+        $availableSlots = collect(); // Initialize a collection to store all available slots
+
+        foreach ($slots as $slot) {
+            $startTime = Carbon::parse($slot->slot_start); // e.g., 9:00 AM
+            $endTime = Carbon::parse($slot->slot_end); // e.g., 12:00 PM
 
             // Calculate total duration in minutes
             $totalDuration = $startTime->diffInMinutes($endTime);
             // Calculate the number of intervals
-            $numberOfIntervals = $totalDuration / $intervalTime;
+            $numberOfIntervals = floor($totalDuration / $intervalTime); // Use floor to avoid partial intervals
+
             // Get all booked slots for the given day and date
             $bookedSlots = DB::table('reservations')
                 ->where('day', $day)
@@ -116,11 +172,14 @@ class Restaurant extends Model
                 ->whereNotIn('status', ['completed', 'cancelled'])
                 ->select('start', 'end')
                 ->get();
-            $availableSlots = collect();
+
+            // Iterate through each interval
             for ($i = 0; $i < $numberOfIntervals; $i++) {
                 $slotStart = $startTime->copy()->addMinutes($i * $intervalTime);
                 $slotEnd = $slotStart->copy()->addMinutes($intervalTime);
                 $isAvailable = true;
+
+                // Check if the current slot overlaps with any booked slot
                 foreach ($bookedSlots as $bookedSlot) {
                     $bookedStart = Carbon::parse($bookedSlot->start);
                     $bookedEnd = Carbon::parse($bookedSlot->end);
@@ -130,6 +189,8 @@ class Restaurant extends Model
                         break;
                     }
                 }
+
+                // If the slot is available, add it to the collection
                 if ($isAvailable) {
                     $availableSlots->push([
                         'start' => $slotStart->format('H:i:s'),
@@ -137,14 +198,14 @@ class Restaurant extends Model
                     ]);
                 }
             }
-            // Calculate total available minutes
-            $totalAvailableMinutes = $availableSlots->count() * $intervalTime;
-            return $availableSlots;
-         }
+        }
 
-
-
+        // Return all available slots across all time ranges
+        return $availableSlots;
     }
+
+
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults();
