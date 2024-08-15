@@ -41,6 +41,17 @@ class Restaurant extends Model
         return $this->hasMany(Slot::class,'restaurant_id','id')->where('status','active')->select(['id','uuid','restaurant_id','day','slot_start', 'slot_end']);
     }
 
+
+
+    public function slots()
+    {
+        return $this->aval_slots::where('status', 'active')
+        ->orderBy('day')->orderBy('slot_end') // Optional: to ensure slots are ordered by day
+        ->get()
+        ->groupBy('day');
+    }
+
+
     public function slots_booked()
     {
         return $this->hasMany(Reservation::class, 'restaurant_id','id');
