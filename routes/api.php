@@ -85,6 +85,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         });
         Route::prefix('restaurant')->group(function () {
             Route::post('users', [UserController::class, 'user_create']);
+            Route::post('restaurants-users', [UserController::class, 'restaurant_user_list']);
             Route::post('floors', [RestaurantController::class, 'floor_area_create']);
             Route::post('slot-create-update', [RestaurantController::class, 'slot_create']);
             Route::get('slot-info/{rest_uuid}', [RestaurantController::class, 'slot_info']);

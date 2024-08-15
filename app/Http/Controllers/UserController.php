@@ -117,6 +117,36 @@ class UserController extends Controller
     }
 
 
+    public function restaurant_user_list(Request $request){
+        $validateUser = Validator::make($request->all(), [
+                'user_uuid' =>  'required|exists:users,uuid',
+                'rest_uuid' => 'required|exists:restaurants,uuid',
+            ]);
+            if ($validateUser->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'validation error',
+                    'errors' => $validateUser->errors()
+                ], 401);
+            }
+        $user= User::where('uuid', $request->user_uuid)->where('res_uuid', $request->rest_uuid)->first();
+        if (!empty($user) && $user->status == 'active' && $user->user_type == 'admin') {
+            $user_staf = User::where('res_uuid', $request->rest_uuid)->get();
+            return response()->json([
+                'status' => true,
+                'message' => 'User Info',
+                'data' => $user_staf
+            ], 200);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'User Not Found'
+            ], 404);
+        }
+    }
+
+
+
 
 
 
