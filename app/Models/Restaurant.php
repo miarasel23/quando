@@ -45,8 +45,9 @@ class Restaurant extends Model
 
     public function slots()
     {
-        return $this->aval_slots::where('status', 'active')
-        ->orderBy('day')->orderBy('slot_end') // Optional: to ensure slots are ordered by day
+        return $this->aval_slots()
+        ->orderBy('day')
+        ->orderBy('slot_end') // Optional: to ensure slots are ordered by day and slot_end
         ->get()
         ->groupBy('day');
     }
