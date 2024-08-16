@@ -280,7 +280,7 @@ class RestaurantController extends Controller
     }
      public function single_slot_delete($uuid) {
             $slots = Slot::where('uuid',$uuid)->first();
-            if ($slots->isNotEmpty()) {
+            if (!empty($slots)) {
                 // Delete the retrieved slots
                $slots->delete();
                 return response()->json([
