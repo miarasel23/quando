@@ -89,6 +89,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             Route::post('floors', [RestaurantController::class, 'floor_area_create']);
             Route::post('slot-create-update', [RestaurantController::class, 'slot_create']);
             Route::get('slot-delete/{rest_uuid}/{day}', [RestaurantController::class, 'slot_delete']);
+            Route::get('slot-single-delete/{uuid}/', [RestaurantController::class, 'single_slot_delete']);
             Route::get('slot-info/{rest_uuid}', [RestaurantController::class, 'slot_info']);
             Route::post('tables', [RestaurantController::class, 'table_create']);
             Route::post('label-tags', [RestaurantController::class, 'label_tag_create']);

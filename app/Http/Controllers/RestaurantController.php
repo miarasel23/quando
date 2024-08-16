@@ -278,6 +278,22 @@ class RestaurantController extends Controller
             ]);
         }
     }
+     public function single_slot_delete($uuid) {
+            $slots = Slot::where('uuid',$uuid)->first();
+            if ($slots->isNotEmpty()) {
+                // Delete the retrieved slots
+               $slots->delete();
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Slots Deleted Successfully'
+                ]);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Slots Not Found'
+                ]);
+            }
+    }
 
 
      public function table_create(Request $request){
