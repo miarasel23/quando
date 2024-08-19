@@ -338,41 +338,48 @@ class AdminController extends Controller
         ->select(['id', 'uuid', 'restaurant_id', 'name', 'address', 'phone', 'email', 'category', 'description', 'post_code', 'status', 'avatar', 'website', 'online_order'])
         ->first();
 
-        if ($restaurant->count() == 0) {
+        if (empty($restaurant)) {
             return response()->json([
                 'status' => false,
                 'message' => 'Restaurant not found'
             ], 404);
         }
-        $groupedMenus = $restaurant->menus->groupBy('menu_category_id');
-        $categories = [];
-            foreach ($groupedMenus as $categoryId => $menus) {
-                $category = $menus->first()->menu_category;
-                $categories[] = [
+    $categories = [];
+    foreach ($restaurant->menus as $menu) {
+        $category = $menu->menu_category;
+        if ($category) {
+            if (!isset($categories[$category->id])) {
+                $categories[$category->id] = [
                     'id' => $category->id,
                     'uuid' => $category->uuid,
                     'name' => $category->name,
                     'status' => $category->status,
                     'created_at' => $category->created_at,
                     'updated_at' => $category->updated_at,
-                    'menus' => $menus->map(function ($menu) {
-                        return [
-                            'id' => $menu->id,
-                            'uuid' => $menu->uuid,
-                            'name' => $menu->name,
-                            'description' => $menu->description,
-                            'halal_name' => $menu->halal_name,
-                            'restaurant_id' => $menu->restaurant_id,
-                            'menu_category_id' => $menu->menu_category_id,
-                            'price' => $menu->price,
-                            'price_symbol' => $menu->price_symbol,
-                            'status' => $menu->status,
-                            'created_at' => $menu->created_at,
-                            'updated_at' => $menu->updated_at
-                        ];
-                    })->toArray()
+                    'menus' => [],
                 ];
             }
+
+            $categories[$category->id]['menus'][] = [
+                'id' => $menu->id,
+                'uuid' => $menu->uuid,
+                'name' => $menu->name,
+                'description' => $menu->description,
+                'halal_name' => $menu->halal_name,
+                'restaurant_id' => $menu->restaurant_id,
+                'menu_category_id' => $menu->menu_category_id,
+                'price' => $menu->price,
+                'price_symbol' => $menu->price_symbol,
+                'status' => $menu->status,
+                'created_at' => $menu->created_at,
+                'updated_at' => $menu->updated_at,
+            ];
+        }
+    }
+
+    // Resetting the categories to be an indexed array
+    $categories = array_values($categories);
+
             $data = [
                 'id' => $restaurant->id,
                 'uuid' => $restaurant->uuid,
@@ -393,32 +400,30 @@ class AdminController extends Controller
                 'menu_description' => $restaurant->menu_description,
                 'photo_description' => $restaurant->photo_description,
                 'reviews_description' => $restaurant->reviews_description,
-                'photo'=>$restaurant->photos,
+                'photo' => $restaurant->photos,
                 'reviews' => $restaurant->reviews,
-                'aval_slots' =>   $restaurant->aval_slots->groupBy('day'),
-                'reviews_description' => $restaurant->reviews_description,
-                'categories' => $categories
+                'aval_slots' => $restaurant->aval_slots->groupBy('day'),
+                'categories' => $categories,
             ];
-        if (empty($restaurant)) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Restaurant not found'
-            ], 404);
-        }
-        $validateUser = Validator::make($request->all(), [
-            'start_time' => 'string',
-            'end_time' => 'string',
-            'date' => 'string',
-            'day'=>'string',
-        ]);
-        if ($validateUser->fails()) {
-            return response()->json([
-                'status' => false,
-                'message' => 'validation error',
-                'errors' => $validateUser->errors()
-            ], 401);
-        }
-
+            if (empty($restaurant)) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Restaurant not found'
+                ], 404);
+            }
+            $validateUser = Validator::make($request->all(), [
+                'start_time' => 'string',
+                'end_time' => 'string',
+                'date' => 'string',
+                'day'=>'string',
+            ]);
+            if ($validateUser->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'validation error',
+                    'errors' => $validateUser->errors()
+                ], 401);
+            }
 
 
         $tabledata = Reservation::where([
