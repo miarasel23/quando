@@ -234,14 +234,14 @@ class ReservationController extends Controller
             ], 401);
         }
         if (in_array($request->params, ["info"])) {
-            $perPage = $request->input('per_page', 10);
+            $perPage = $request->input('per_page', 100000);
             $rest_data = Restaurant::where('uuid', $request->rest_uuid)->first();
 
             if ($rest_data != null) {
-                $reservation = Reservation::where('restaurant_id', $rest_data->id)
-                    // ->whereHas('guest_information', function ($query) {
-                    //     $query->where('status', 'active');
-                    // })
+                $reservation = Reservation::where('restaurant_id', $rest_data->id)->where('status', '=','hold')
+                    ->whereHas('guest_information', function ($query) {
+                        $query->where('status', 'active');
+                    })
                     ->with('guest_information', 'table_master', 'restaurant')->orderBy('id', 'desc')
                     ->paginate($perPage);
 
