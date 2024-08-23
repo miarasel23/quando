@@ -12,10 +12,23 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Laravel\Sanctum\PersonalAccessToken;
 use  Illuminate\Support\Facades\DB;
-
+use App\Traits\emaiTraits;
 class UserController extends Controller
 {
-    //
+
+
+
+    use emaiTraits;
+
+
+    public function user_activation_sent_link(Request $request){
+     $data = $this->sendEmail($request,'user');
+            return response()->json([
+            'status' => true,
+            'message' => 'activation link sent successfully',
+            'data' => $data
+        ], 200);
+    }
 
     public function user_create(Request $request)
     {
@@ -129,7 +142,7 @@ class UserController extends Controller
                     'errors' => $validateUser->errors()
                 ], 401);
             }
-        $user= User::where('uuid', $request->user_uuid)->where('res_uuid', $request->rest_uuid)->first();
+        $user= User::where('uuid', $request->user_uuid)->first();
         if (!empty($user) && $user->status == 'active' && $user->user_type == 'admin'  or $user->user_type == 'super_admin') {
             $user_staf = User::where('res_uuid', $request->rest_uuid)->get();
             return response()->json([

@@ -26,6 +26,8 @@ Route::prefix('v1/user/')->group(function () {
 
     Route::post('review-create', [FunctionController::class, 'review_create']);
 
+    Route::post('user-activation-sent-link', [UserController::class, 'user_activation_sent_link']);
+
 
     Route::prefix('reservation')->group(function () {
         Route::get('reservation-time-hold', [ReservationController::class, 'time_hold']);
