@@ -12,6 +12,7 @@ use App\Models\Slot;
 use App\Models\TableMaster;
 use App\Models\LabelTag;
 use App\Models\AboutTag;
+use App\Models\Reservation;
 use Auth;
 use Laravel\Sanctum\PersonalAccessToken;
 use  Illuminate\Support\Facades\DB;
@@ -448,6 +449,75 @@ class RestaurantController extends Controller
             ], 200);
         }
     }
+
+
+
+
+
+    public function available_tables(Request $request)
+    {
+        // Validate the input data
+        $validateUser = Validator::make($request->all(), [
+            'rest_uuid' =>  'required|exists:restaurants,uuid',
+            'reservation_uuid' => 'required|exists:reservations,uuid',
+        ]);
+
+        // Return validation errors if validation fails
+        if ($validateUser->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation error',
+                'errors' => $validateUser->errors()
+            ], 401);
+        }
+
+        // Fetch the reservation using the provided reservation UUID
+        $reservation = Reservation::where('uuid', $request->reservation_uuid)->first();
+
+        // If the reservation exists
+        if ($reservation != null) {
+            // Get the current restaurant's active tables
+            $tables = TableMaster::where('restaurant_id', $reservation->restaurant_id)
+                                ->where('status', 'active')
+                                ->get();
+
+            // Filter the tables based on availability for a future time
+            $availableTables = $tables->filter(function ($table) use ($reservation) {
+                // Check for existing reservations that might overlap with the given reservation
+                $existingReservations = Reservation::where('table_master_id', $table->id)
+                    ->where('reservation_date', $reservation->reservation_date)
+                    ->where(function ($query) use ($reservation) {
+                        $query->where(function ($query) use ($reservation) {
+                            $query->where('start', '<', $reservation->start)
+                                  ->where('end', '>', $reservation->start);
+                        })->orWhere(function ($query) use ($reservation) {
+                            $query->where('start', '<', $reservation->end)
+                                  ->where('end', '>', $reservation->end);
+                        })->orWhere(function ($query) use ($reservation) {
+                            $query->where('start', '>=', $reservation->start)
+                                  ->where('end', '<=', $reservation->end);
+                        });
+                    })->exists();
+
+                // If there are no overlapping reservations, the table is available
+                return !$existingReservations;
+            });
+
+            // Return the available tables
+            return response()->json([
+                'status' => true,
+                'message' => 'Available tables fetched successfully',
+                'data' => $availableTables->values()
+            ]);
+        } else {
+            // Return an error if the reservation doesn't exist
+            return response()->json([
+                'status' => false,
+                'message' => 'Reservation not found',
+            ], 404);
+        }
+    }
+
 
     public function label_tag_create(Request $request){
         if(in_array($request->params, ['update','delete','info'])){

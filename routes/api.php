@@ -97,6 +97,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             Route::post('label-tags', [RestaurantController::class, 'label_tag_create']);
             Route::post('about-tags', [RestaurantController::class, 'about_tag_create']);
             Route::get('reservation-for-restaurant', [ReservationController::class, 'reservation_for_restaurant']);
+
+            Route::post('available-tables', [RestaurantController::class, 'available_tables']);
         });
 
 
