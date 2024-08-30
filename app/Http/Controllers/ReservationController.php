@@ -215,6 +215,24 @@ class ReservationController extends Controller
             ], 404);
         }
     }
+
+
+    public function reservation_list(){
+        $reservation = Reservation::where('status','!=', 'hold')->with('guest_information','table_master','restaurant')->get();
+        if($reservation != null){
+            return response()->json([
+                'status' => true,
+                'message' => 'Reservation Info',
+                'data' => $reservation
+            ], 200);
+        }else{
+            return response()->json([
+                'status' => false,
+                'message' => 'Reservation Not Found',
+            ], 404);
+        }
+    }
+
     public function reservation_for_restaurant(Request $request){
         if (in_array($request->params, ['cancel', 'checkin', 'checkout'])) {
             $data = Reservation::where('uuid', $request->uuid)->first();

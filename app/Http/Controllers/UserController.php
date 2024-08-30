@@ -411,4 +411,22 @@ public function logout(Request $request){
     }
 }
 
+
+public function gest_list(){
+
+    $user = GuestInformaion::orderBy('id', 'desc')->with('guest_reservations')->get();
+    if (!empty($user)) {
+        return response()->json([
+            'status' => true,
+            'message' => 'User Info',
+            'data' => $user
+        ], 200);
+    } else {
+        return response()->json([
+            'status' => false,
+            'message' => 'User Not Found'
+        ], 404);
+    }
+}
+
 }

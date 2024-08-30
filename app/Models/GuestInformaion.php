@@ -52,6 +52,11 @@ class GuestInformaion extends Authenticatable
         return $this->hasMany(Reservation::class,'guest_information_id','id');
     }
 
+    public function guest_reservations(){
+
+        return $this->hasMany(Reservation::class,'guest_information_id','id')->with('table_master','restaurant');
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults();

@@ -83,8 +83,11 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::prefix('admin')->group(function () {
             Route::post('restaurants', [AdminController::class, 'restaurant_create']);
             Route::get('/restaurant-for-admin',[AdminController::class,'restaurant_list_for_admin']);
-
+            Route::get('reservation-list', [ReservationController::class, 'reservation_list']);
+            Route::get('guest-list', [UserController::class, 'gest_list']);
         });
+
+
         Route::prefix('restaurant')->group(function () {
             Route::post('users', [UserController::class, 'user_create']);
             Route::post('restaurants-users', [UserController::class, 'restaurant_user_list']);
