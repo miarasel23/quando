@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 use App\Models\Restaurant;
 use App\Models\Slot;
+use App\Models\FloorArea;
 use App\Models\Category;
 use App\Models\Reservation;
 use App\Models\TableMaster;
@@ -157,7 +158,7 @@ class AdminController extends Controller
                 'restaurant_id' => '123',
                 'created_by' => $request['created_by'],
                 'website' => $request['website'],
-                'status' => $request['status'],
+                'status' => "inactive",
             ]);
             return response()->json([
                 'status' => true,
@@ -192,11 +193,40 @@ class AdminController extends Controller
         $restaurant->post_code = $request->post_code;
         $restaurant->website = $request->website;
         $restaurant->updated_by = $request->updated_by;
-        $restaurant->status = $request->status;
+        if($request->status == "inactive"){
+            $restaurant->status = $request->status;
+        }
         if($request->hasFile('avatar')){
             $restaurant->avatar =  $this->updateImage('avatar',$request->avatar,  $restaurant->avatar,null, null);
         }
         $restaurant->save();
+        if($request->status == "active"){
+           $floarData = FloorArea::where('restaurant_id', $restaurant->id)->where('status', 'active')->get();
+           if(count($floarData) == 0){
+            return response()->json([
+                'status' => true,
+                'message' => 'Restaurant can not be active as it has no floor area',
+            ]);
+           }
+           $tableData = TableMaster::where('restaurant_id', $restaurant->id)->where('status', 'active')->get();
+           if(count($tableData) == 0){
+            return response()->json([
+                'status' => true,
+                'message' => 'Restaurant can not be active as it has no table',
+            ]);
+           }
+           $slotsData = Slot::where('restaurant_id', $restaurant->id)->where('status', 'active')->get();
+           if(count($slotsData) == 0){
+            return response()->json([
+                'status' => true,
+                'message' => 'Restaurant can not be active as it has no slots',
+            ]);
+           }
+
+           if( count($floarData) > 0 && count($tableData) > 0 && count($slotsData) > 0){
+             $restaurant->update(['status' => 'active']);
+           }
+        }
         return response()->json([
             'status' => true,
             'message' => 'Restaurant updated successfully',
