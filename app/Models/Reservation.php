@@ -46,10 +46,26 @@ class Reservation extends Model
         return $this->belongsTo(Restaurant::class, 'restaurant_id', 'id');
     }
 
+
+    public function cancel_guest()
+    {
+        return $this->belongsTo(GuestInformaion::class, 'updated_by', 'uuid');
+    }
+
+
+  public function cancel_rest()
+    {
+        return $this->belongsTo(User::class, 'updated_by', 'uuid');
+    }
+
+
+
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults();
     }
+
 
 
     protected static function boot()

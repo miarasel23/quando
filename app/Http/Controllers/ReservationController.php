@@ -203,7 +203,7 @@ class ReservationController extends Controller
 
         $user = GuestInformaion::where('uuid', $uuid)->first();
         if($user != null){
-        $reservation = Reservation::where('guest_information_id', $user->id)->with('guest_information','table_master','restaurant')->get();
+        $reservation = Reservation::where('guest_information_id', $user->id)->with('guest_information','table_master','restaurant','cancel_guest','cancel_rest')->get();
         if($reservation != null){
             return response()->json([
                 'status' => true,
@@ -226,7 +226,7 @@ class ReservationController extends Controller
 
 
     public function reservation_list(){
-        $reservation = Reservation::where('status','!=', 'hold')->with('guest_information','table_master','restaurant')->get();
+        $reservation = Reservation::where('status','!=', 'hold')->with('guest_information','table_master','restaurant','cancel_guest','cancel_rest')->get();
         if($reservation != null){
             return response()->json([
                 'status' => true,
@@ -250,6 +250,7 @@ class ReservationController extends Controller
             'checkin_time' => in_array($request->params, ['checkin']) ? 'required' : 'nullable',
             'checkout_time' => in_array($request->params, ['checkout']) ? 'required' : 'nullable',
             'uuid' => in_array($request->params, ['checkin', 'checkout', 'cancel']) ? 'required|exists:reservations,uuid' : 'nullable',
+            'user_uuid' => in_array($request->params, [ 'cancel']) ? 'required' : 'nullable',
             'params' => 'required|string'
         ]);
         if ($validateUser->fails()) {
@@ -268,7 +269,7 @@ class ReservationController extends Controller
                     ->whereHas('guest_information', function ($query) {
                         $query->where('status', 'active');
                     })
-                    ->with('guest_information', 'table_master', 'restaurant')->orderBy('id', 'desc')
+                    ->with('guest_information', 'table_master', 'restaurant','cancel_guest','cancel_rest')->orderBy('id', 'desc')
                     ->paginate($perPage);
 
                 if ($reservation != null) {
@@ -320,8 +321,11 @@ class ReservationController extends Controller
             }
         }elseif(in_array($request->params, ['cancel'])){
             if ($data != null && $data->status == 'checkin' || $data->status == 'pending') {
+
                 $data->status = 'cancelled';
                 $data->noted = $request->note;
+                $data->updated_by = $request->user_uuid;
+
                 $data->save();
                 return response()->json([
                     'status' => true,
