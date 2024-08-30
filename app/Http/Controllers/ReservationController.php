@@ -265,7 +265,7 @@ class ReservationController extends Controller
             $rest_data = Restaurant::where('uuid', $request->rest_uuid)->first();
 
             if ($rest_data != null) {
-                $reservation = Reservation::where('restaurant_id', $rest_data->id)->where('status', '=','hold')
+                $reservation = Reservation::where('restaurant_id', $rest_data->id)->where('status', '!=','hold')
                     ->whereHas('guest_information', function ($query) {
                         $query->where('status', 'active');
                     })
