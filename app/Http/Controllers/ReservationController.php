@@ -24,7 +24,7 @@ class ReservationController extends Controller
             $old_reservation = Reservation::where('uuid', $request->uuid)->where('status', 'hold')->first();
         }
         $validateUser = Validator::make($request->all(), [
-            'user_uuid' => 'string',
+            'user_uuid' => 'string|exists:guest_informaions,uuid',
             'rest_uuid' => 'required',
             'start_time' => 'required',
             'end_time' => 'required',
@@ -55,7 +55,8 @@ class ReservationController extends Controller
        ])
        ->whereNotIn('status', ['cancelled', 'completed'])
        ->get();
-       $allTables = TableMaster::where('restaurant_id', $rest_data->id)->get();
+       $allTables = TableMaster::where('restaurant_id', $rest_data->id)->orderBy('max_seats', 'asc')  // Order by max_seats in ascending order
+       ->get();
         if (count($tabledata) > 0 && count($allTables) > 0) {
             $reservedTableIds = $tabledata->pluck('table_master_id')->toArray();
             $availableTables = $allTables->filter(function ($table) use ($reservedTableIds) {
@@ -64,13 +65,16 @@ class ReservationController extends Controller
         } else {
             $availableTables = $allTables;
         }
+        $assigned_table = $availableTables->first(function ($tableAssing) use ($request) {
+            return $tableAssing->max_seats >= $request->number_of_people;
+        });
 
-        if(count($availableTables) > 0 && in_array($request->params, ['create'])){
+        if(!empty($assigned_table) && in_array($request->params, ['create'])){
             $user = Reservation::create([
                 'restaurant_id' => $rest_data->id,
                 'user_id' =>$request->user_uuid != null ? $user_data->id :null,
                 'reservation_time' => $request->start_time,
-                'table_master_id' => $availableTables[0]->id,
+                'table_master_id' => $assigned_table->id,
                 'start' => $request->start_time,
                 'end' => $request->end_time,
                 'reservation_date' => $request->date,
@@ -105,6 +109,10 @@ class ReservationController extends Controller
                 'message' => 'No Tables Available',
             ], 401);
         }
+
+
+
+
     }
 
 
