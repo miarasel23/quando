@@ -266,9 +266,9 @@ class ReservationController extends Controller
 
             if ($rest_data != null) {
                 $reservation = Reservation::where('restaurant_id', $rest_data->id)->where('status', '!=','hold')
-                    ->whereHas('guest_information', function ($query) {
-                        $query->where('status', 'active');
-                    })
+                    // ->whereHas('guest_information', function ($query) {
+                    //     $query->where('status', 'active');
+                    // })
                     ->with('guest_information', 'table_master', 'restaurant','cancel_guest','cancel_rest')->orderBy('id', 'desc')
                     ->paginate($perPage);
 
