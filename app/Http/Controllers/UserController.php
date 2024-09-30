@@ -240,7 +240,7 @@ class UserController extends Controller
                 'country' => $request->country,
                 'post_code' => $request->post_code,
                 'password' => Hash::make($request->password),
-                 'status' => $request->password ? 'inactive' : 'active'
+                'status' => $request->password ? 'inactive' : 'active'
             ]);
             }
 
