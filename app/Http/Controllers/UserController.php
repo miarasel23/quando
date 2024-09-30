@@ -211,7 +211,7 @@ class UserController extends Controller
                 'country' => $request->country,
                 'post_code' => $request->post_code,
                 'password' => Hash::make($request->password),
-                'status' => $request->password ? 'active' : 'inactive'
+                'status' => $request->password ? 'inactive' : 'active'
             ]);
         }
         if (in_array($request->params, ['create'])) {
