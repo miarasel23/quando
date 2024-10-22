@@ -306,6 +306,73 @@ class AdminController extends Controller
         ], 200);
     }
 
+    public function restaurant_top_review(Request $request)
+    {
+        $perPage = $request->input('per_page', 10);
+
+        $restaurant = Restaurant::with([
+                'category_list',
+                'aval_slots',
+                'label_tags',
+                'about_label_tags',
+                'photos',
+                'reviews'
+            ])
+            ->select([
+                'restaurants.id',
+                'restaurants.uuid',
+                'restaurants.restaurant_id',
+                'restaurants.name',
+                'restaurants.address',
+                'restaurants.phone',
+                'restaurants.email',
+                'restaurants.category',
+                'restaurants.description',
+                'restaurants.post_code',
+                'restaurants.status',
+                'restaurants.avatar',
+                'restaurants.website',
+                'restaurants.online_order',
+                \DB::raw('COALESCE(AVG(reviews.rating), 0) as avg_rating')
+            ])
+            ->leftJoin('reviews', function ($join) {
+                $join->on('restaurants.id', '=', 'reviews.restaurant_id')
+                    ->where('reviews.status', 'active');
+            })
+            ->where('restaurants.status', 'active')
+            ->groupBy([
+                'restaurants.id',
+                'restaurants.uuid',
+                'restaurants.restaurant_id',
+                'restaurants.name',
+                'restaurants.address',
+                'restaurants.phone',
+                'restaurants.email',
+                'restaurants.category',
+                'restaurants.description',
+                'restaurants.post_code',
+                'restaurants.status',
+                'restaurants.avatar',
+                'restaurants.website',
+                'restaurants.online_order'
+            ])
+            ->orderBy('avg_rating', 'desc')
+            ->orderBy('restaurants.id', 'desc')
+            ->paginate($perPage);
+
+        if ($restaurant->count() == 0) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Restaurant not found'
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => true,
+            'data' => $restaurant
+        ], 200);
+    }
+
 
     public function restaurant_list_for_admin(Request $request){
         $perPage = $request->input('per_page', 10000);

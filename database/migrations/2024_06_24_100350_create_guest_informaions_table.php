@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('post_code')->nullable();
             $table->string('city')->nullable();
             $table->string('country')->nullable();
+            $table->string('avatar')->nullable();
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->rememberToken();
             $table->timestamps();

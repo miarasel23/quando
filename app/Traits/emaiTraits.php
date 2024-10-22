@@ -8,35 +8,110 @@ use File;
 use Illuminate\Support\Facades\Validator;
 use PHPMailer\PHPMailer\PHPMailer;
 // use Intervention\Image\Facades\Image as Image;
+use PHPMailer\PHPMailer\Exception;
+use Illuminate\Support\Facades\Cache;
+use Carbon\Carbon;
 
 trait emaiTraits {
 
 
-    public function sendEmail(Request $request, $subject){
 
-    $mail = new PHPMailer(true);
-    $mail->SMTPDebug = 0;
-    $mail->isSMTP();
-    $mail->Host = 'smtp.tablebookings.co.uk'; //  smtp host
-    $mail->SMTPAuth = true;
-    $mail->Username = 'reservations@tablebookings.co.uk'; // sender username
-    $mail->Password = '1C4yb1s$8'; // sender password
-    $mail->SMTPSecure = 'tls';  // encryption - ssl/tls
-    $mail->Port = 587; // port - 587/465
+    public function sendEmail( $request, $subject){
 
-    $mail->setfrom('reservations@tablebookings.co.uk', 'reservations@tablebookings.co.uk');
-    $mail->addaddress('rasel.chefonline@gmail.com','rasel.chefonline@gmail.com');
-    //$mail->addCC($request->emailCc);
-    //$mail->addbcc('hello@salikandco.com');
 
-    $mail->isHTML(true); // Set email content format to HTML
-    // $body = view('email_template.enquiries_view', compact('request'))->render();
-    $body = 'This is the HTML message body <b>in bold!</b>';
-    $mail->Subject = $subject;
-    $mail->Body    = $body;
-    $mail->AltBody = 'plain text version of email body';
-    $mail->send();
-    return true;
+        $mail = new PHPMailer(true);
+        try {
+            // Server settings
+            $mail->SMTPDebug = 2; // Enable verbose debug output
+            $mail->isSMTP(); // Set mailer to use SMTP
+            $mail->Host = 'mail.tablebookings.co.uk'; // Specify main SMTP server
+            $mail->SMTPAuth = true; // Enable SMTP authentication
+            $mail->Username = 'reservations@tablebookings.co.uk'; // SMTP username
+            $mail->Password = 'uy!5a8Y47'; // SMTP password
+            $mail->SMTPSecure = 'ssl'; // Enable SSL encryption
+            $mail->Port = 465; // TCP port for SSL
+
+            // Disable SSL certificate verification (for testing purposes only)
+            $mail->SMTPOptions = array(
+                'ssl' => array(
+                    'verify_peer' => false,
+                    'verify_peer_name' => false,
+                    'allow_self_signed' => true
+                )
+            );
+
+            // Recipients
+            $mail->setFrom('reservations@tablebookings.co.uk', 'Table Bookings');
+            $mail->addAddress($request->email, 'Recipient Name');
+
+            // Content
+            $mail->isHTML(true); // Set email format to HTML
+            $mail->Subject = $subject;
+            $mail->Body    = view('email_template.account_activataion_template', compact('request'))->render();
+            //$mail->AltBody = 'This is the plain text version of the email body.';
+
+            // Send the email
+            if ($mail->send()) {
+                echo 'Message has been sent';
+            } else {
+                echo 'Message could not be sent.';
+            }
+
+        } catch (Exception $e) {
+            echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+        }
+
+    }
+
+
+
+
+
+    public function sendEmailForgetPassword( $request, $subject){
+
+
+        $mail = new PHPMailer(true);
+        try {
+            // Server settings
+            $mail->SMTPDebug = 2; // Enable verbose debug output
+            $mail->isSMTP(); // Set mailer to use SMTP
+            $mail->Host = 'mail.tablebookings.co.uk'; // Specify main SMTP server
+            $mail->SMTPAuth = true; // Enable SMTP authentication
+            $mail->Username = 'reservations@tablebookings.co.uk'; // SMTP username
+            $mail->Password = 'uy!5a8Y47'; // SMTP password
+            $mail->SMTPSecure = 'ssl'; // Enable SSL encryption
+            $mail->Port = 465; // TCP port for SSL
+
+            // Disable SSL certificate verification (for testing purposes only)
+            $mail->SMTPOptions = array(
+                'ssl' => array(
+                    'verify_peer' => false,
+                    'verify_peer_name' => false,
+                    'allow_self_signed' => true
+                )
+            );
+
+            // Recipients
+            $mail->setFrom('reservations@tablebookings.co.uk', 'Table Bookings');
+            $mail->addAddress($request->email, 'Recipient Name');
+            $otp = rand(100000, 999999);
+            Cache::put($request->email, $otp, Carbon::now()->addMinutes(5));
+            // Content
+            $mail->isHTML(true); // Set email format to HTML
+            $mail->Subject = $subject;
+            $mail->Body    = view('email_template.forget_password_otp', compact('request','otp'))->render();
+            //$mail->AltBody = 'This is the plain text version of the email body.';
+
+            // Send the email
+            if ($mail->send()) {
+                echo 'Message has been sent';
+            } else {
+                echo 'Message could not be sent.';
+            }
+
+        } catch (Exception $e) {
+            echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+        }
 
     }
 }
