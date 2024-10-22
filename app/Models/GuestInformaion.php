@@ -23,6 +23,7 @@ class GuestInformaion extends Authenticatable
         'city',
         'post_code',
         'country',
+        'avatar',
         'status',
         'password'
     ];
