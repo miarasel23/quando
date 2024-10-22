@@ -23,11 +23,14 @@ Route::prefix('v1/user/')->group(function () {
     Route::get('/search-restaurant',[AdminController::class,'restaurant_search_list']);
     Route::get('/category',[AdminController::class,'category']);
     Route::get('restaurant-single-info/{uuid}', [AdminController::class, 'restaurant_single_info']);
-
     Route::post('review-create', [FunctionController::class, 'review_create']);
-
     Route::post('user-activation-sent-link', [UserController::class, 'user_activation_sent_link']);
 
+
+
+    Route::post('/forget-password',[UserController::class,'forget_password']);
+
+    Route::post('verify-otp',[UserController::class,'verify_otp']);
 
     Route::prefix('reservation')->group(function () {
         Route::get('reservation-time-hold', [ReservationController::class, 'time_hold']);

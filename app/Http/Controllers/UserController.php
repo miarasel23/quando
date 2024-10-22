@@ -13,6 +13,7 @@ use Illuminate\Validation\Rule;
 use Laravel\Sanctum\PersonalAccessToken;
 use  Illuminate\Support\Facades\DB;
 use App\Traits\emaiTraits;
+use Illuminate\Support\Facades\Cache;
 class UserController extends Controller
 {
 
@@ -167,7 +168,22 @@ class UserController extends Controller
         if(in_array($request->params, ['update', 'info'])){
             $old_guest = GuestInformaion::where('uuid', $request->uuid)->first();
         }
-
+        if(in_array($request->params, ['create'])){
+            $old_guest_active = GuestInformaion::where([
+                ['phone', $request->phone],
+                ['status','=', 'active'],
+                ])->orWhere([
+                    ['email', $request->email],
+                    ['status','=', 'active'],
+                    ])->first();
+                if(!empty($old_guest_active)){
+                    return response()->json([
+                        'status' => true,
+                        'message' => 'This is already a registered user',
+                        'data' => $old_guest_active
+                    ], 200);
+            }
+        }
         $validateUser = Validator::make($request->all(), [
             'first_name' => 'required',
             'last_name' => 'required',
@@ -211,8 +227,11 @@ class UserController extends Controller
                 'country' => $request->country,
                 'post_code' => $request->post_code,
                 'password' => Hash::make($request->password),
-                'status' => $request->password ? 'inactive' : 'active'
+                'status' => $request->password ?   $old_guest ->status == 'active' ? 'active' : 'inactive' : 'inactive'
             ]);
+            if($old_guest->status == 'inactive'){
+               $data = $this->sendEmail($old_guest,'Activate Your Account');
+            }
         }
         if (in_array($request->params, ['create'])) {
             $user = GuestInformaion::where('email', $request->email)->orWhere('phone', $request->phone)->first();
@@ -227,8 +246,12 @@ class UserController extends Controller
                     'country' => $request->country,
                     'post_code' => $request->post_code,
                     'password' => Hash::make($request->password),
-                    'status' => $request->password ? 'inactive' : 'active'
+                    'status' => $request->password ?   $user ->status == 'active' ? 'active' : 'inactive' : 'inactive'
                 ]);
+
+                if($user->status == 'inactive'){
+                    $data = $this->sendEmail($user,'Activate Your Account');
+                 }
             }else{
             $user = GuestInformaion::create([
                 'first_name' => $request->first_name,
@@ -240,8 +263,11 @@ class UserController extends Controller
                 'country' => $request->country,
                 'post_code' => $request->post_code,
                 'password' => Hash::make($request->password),
-                'status' => $request->password ? 'inactive' : 'active'
+                'status' => $request->password ? 'inactive' : 'inactive'
             ]);
+             if($user->status == 'inactive'){
+                $data = $this->sendEmail($user,'Activate Your Account');
+             }
             }
 
         }
@@ -429,4 +455,60 @@ public function gest_list(){
     }
 }
 
+
+public function forget_password(Request $request){
+    $validateUser = Validator::make($request->all(), [
+        'email' => 'required|email',
+    ]);
+    if($validateUser->fails()){
+        return response()->json([
+            'status' => false,
+            'message' => 'validation error',
+            'errors' => $validateUser->errors()
+        ], 401);
+    }
+    $user = GuestInformaion::where('email', $request->email)->first();
+    if (!empty($user)) {
+         $this->sendEmailForgetPassword($request,'Forgot password code');
+        return response()->json([
+            'status' => true,
+            'message' => 'OTP send on your email'
+        ], 200);
+    } else {
+        return response()->json([
+            'status' => false,
+            'message' => 'User Not Found'
+        ], 404);
+    }
+   }
+
+
+   public function verify_otp(Request $request){
+
+    $validateUser = Validator::make($request->all(), [
+        'email' => 'required|email',
+        'otp' => 'required',
+    ]);
+    if($validateUser->fails()){
+        return response()->json([
+            'status' => false,
+            'message' => 'validation error',
+            'errors' => $validateUser->errors()
+        ], 401);
+    }
+    $user = GuestInformaion::where('email', $request->email)->first();
+    $otp = Cache::get($request->email);
+    if (!empty($user) && $request->otp == $otp) {
+        Cache::set($request->email,'');
+        return response()->json([
+            'status' => true,
+            'message' => 'OTP verified successfully'
+        ], 200);
+    } else {
+        return response()->json([
+            'status' => false,
+            'message' => 'Invalid OTP'
+        ], 401);
+    }
+   }
 }
