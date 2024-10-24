@@ -16,23 +16,23 @@ use App\Http\Controllers\FunctionController;
 
 Route::prefix('v1/user/')->group(function () {
 
-    Route::post('/login',[AdminController::class,'Login']);
+    Route::post('login',[AdminController::class,'Login']);
     Route::post('guest-register', [UserController::class, 'guest_register']);
     Route::post('guest-login', [UserController::class, 'guest_login']);
-    Route::get('/restaurant',[AdminController::class,'restaurant_list']);
+    Route::get('restaurant',[AdminController::class,'restaurant_list']);
 
-    Route::get('/restaurant-top-review',[AdminController::class,'restaurant_top_review']);
+    Route::get('restaurant-top-review',[AdminController::class,'restaurant_top_review']);
 
 
-    Route::get('/search-restaurant',[AdminController::class,'restaurant_search_list']);
-    Route::get('/category',[AdminController::class,'category']);
+    Route::get('search-restaurant',[AdminController::class,'restaurant_search_list']);
+    Route::get('category',[AdminController::class,'category']);
     Route::get('restaurant-single-info/{uuid}', [AdminController::class, 'restaurant_single_info']);
     Route::post('review-create', [FunctionController::class, 'review_create']);
     Route::post('user-activation-sent-link', [UserController::class, 'user_activation_sent_link']);
 
 
 
-    Route::post('/forget-password',[UserController::class,'forget_password']);
+    Route::post('forget-password',[UserController::class,'forget_password']);
 
     Route::post('verify-otp',[UserController::class,'verify_otp']);
     Route::post('password-update',[UserController::class,'password_update']);
@@ -90,7 +90,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
         Route::prefix('admin')->group(function () {
             Route::post('restaurants', [AdminController::class, 'restaurant_create']);
-            Route::get('/restaurant-for-admin',[AdminController::class,'restaurant_list_for_admin']);
+            Route::get('restaurant-for-admin',[AdminController::class,'restaurant_list_for_admin']);
             Route::get('reservation-list', [ReservationController::class, 'reservation_list']);
             Route::get('guest-list', [UserController::class, 'gest_list']);
         });
