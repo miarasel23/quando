@@ -511,4 +511,35 @@ public function forget_password(Request $request){
         ], 401);
     }
    }
+
+
+   public function reset_password(Request $request){
+    $validateUser = Validator::make($request->all(), [
+        'email' => 'required|email',
+        'password' => 'required',
+    ]);
+    if($validateUser->fails()){
+        return response()->json([
+            'status' => false,
+            'message' => 'validation error',
+            'errors' => $validateUser->errors()
+        ], 401);
+    }
+    $user = GuestInformaion::where('email', $request->email)->first();
+    if (!empty($user)) {
+        $user->password = Hash::make($request->password);
+    $user->save();
+    return response()->json([
+        'status' => true,
+        'message' => 'Password reset successfully'
+    ], 200);
+    }
+     else {
+        return response()->json([
+            'status' => false,
+            'message' => 'User Not Found'
+        ], 404);
+     }
+    }
+
 }
