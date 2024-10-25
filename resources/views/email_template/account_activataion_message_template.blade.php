@@ -93,6 +93,11 @@
         <tr>
             <td class="header">
                 <h1>{{$msg}}</h1>
+                <td class="content">
+
+                    <a href="https://www.tablebookings.co.uk/sign-in">Back to login</a>
+
+                </td>
             </td>
         </tr>
     </table>
