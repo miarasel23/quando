@@ -47,7 +47,6 @@
         .info {
             text-align: center; /* Centre-align customer details */
             margin: 20px 10px;
-            border-bottom: 1px solid #e6e6e6;
             padding-bottom: 10px;
         }
         .footer {
@@ -138,14 +137,7 @@
                 <p>{{ $reservation->guest_information->email }}</p>
                 <p>{{ $reservation->guest_information->phone }}</p>
             </div>
-
-            <!-- Review Section -->
-            <div class="review">
-                <p>Please spare a moment to leave a review <a href="#">here</a>.</p>
-            </div>
         </div>
-
-        <!-- Footer Section -->
         <div class="footer">
             <div class="app-buttons">
                 <a href="{{url('logo.png')}}"><img src="{{ url('logo.png') }}" alt="Tablebookings.co.uk"></a>
@@ -153,7 +145,6 @@
             <p>Thank you for your reservation with <strong>{{ ucwords($reservation->restaurant->name) }}</strong>.</p>
             <p>Tel: {{ $reservation->restaurant->phone }}</p>
         </div>
-
           @if ($reservation->guest_information->status == 'inactive')
           <div class="content" style="text-align:center">
            <td >
