@@ -32,7 +32,7 @@ Route::prefix('v1/user/')->group(function () {
 
 
 
-    Route::post('forget_password_for_gest',[UserController::class,'forget_password']);
+    Route::post('forget-password',[UserController::class,'forget_password']);
 
     Route::post('verify-otp',[UserController::class,'verify_otp']);
     Route::post('password-update',[UserController::class,'password_update']);
