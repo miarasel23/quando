@@ -108,13 +108,13 @@
         <div class="content">
             <h1>{{$reservation->restaurant->name}}</h1>
         </div>
-        <div class="header">
+        {{-- <div class="header">
             <img src="{{ url($reservation->restaurant->avatar) }}" alt="{{ $reservation->restaurant->name }}">
-        </div>
+        </div> --}}
 
         <!-- Content Section -->
         <div class="content">
-            <h1>Reservation Confirmed.</h1>
+            <h4>Reservation Confirmed.</h4>
             <h1>Reservation ID: {{ $reservation->reservation_id }}.</h1>
             <p>Dear <strong>{{ ucwords($reservation->guest_information->first_name) }} {{ ucwords($reservation->guest_information->last_name) }}</strong>,</p>
             <p>If you need to make any changes to your reservation, please call <strong>{{ $reservation->restaurant->phone }}</strong>.</p>
