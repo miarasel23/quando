@@ -114,8 +114,8 @@
 
         <!-- Content Section -->
         <div class="content">
-            <h4>Reservation Confirmed.</h4>
-            <h1>Reservation ID: {{ $reservation->reservation_id }}.</h1>
+            <h2>Reservation Confirmed.</h2>
+            <h4>Reservation ID: {{ $reservation->reservation_id }}.</h4>
             <p>Dear <strong>{{ ucwords($reservation->guest_information->first_name) }} {{ ucwords($reservation->guest_information->last_name) }}</strong>,</p>
             <p>If you need to make any changes to your reservation, please call <strong>{{ $reservation->restaurant->phone }}</strong>.</p>
             <p>Here’s a reminder of your reservation and details you gave us. Please take a moment to check everything is in order.</p>
