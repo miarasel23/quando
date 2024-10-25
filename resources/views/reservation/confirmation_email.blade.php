@@ -105,6 +105,9 @@
 <body>
     <div class="container">
         <!-- Header with Logo -->
+        <div class="content">
+            <h1>{{$reservation->restaurant->name}}</h1>
+        </div>
         <div class="header">
             <img src="{{ url($reservation->restaurant->avatar) }}" alt="{{ $reservation->restaurant->name }}">
         </div>
