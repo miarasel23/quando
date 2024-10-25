@@ -21,8 +21,6 @@ trait emaiTraits {
 
         $mail = new PHPMailer(true);
         try {
-            // Server settings
-            $mail->SMTPDebug = 2; // Enable verbose debug output
             $mail->isSMTP(); // Set mailer to use SMTP
             $mail->Host = 'mail.tablebookings.co.uk'; // Specify main SMTP server
             $mail->SMTPAuth = true; // Enable SMTP authentication
@@ -51,11 +49,7 @@ trait emaiTraits {
             //$mail->AltBody = 'This is the plain text version of the email body.';
 
             // Send the email
-            if ($mail->send()) {
-                echo 'Message has been sent';
-            } else {
-                echo 'Message could not be sent.';
-            }
+           $mail->send();
 
         } catch (Exception $e) {
             echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";

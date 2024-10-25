@@ -160,11 +160,13 @@
         </div>
 
           @if ($reservation->guest_information->status == 'inactive')
-           <td class="content">
+          <div class="content" style="text-align:center">
+           <td >
                 <p> Hi, <strong>{{ ucwords($reservation->guest_information->first_name) }} {{ ucwords($reservation->guest_information->last_name) }} </strong> Please activate your account. </p>
-                <a href="{{ url('activation-link?uuid='.$reservation->uuid) }}">CLICK TO ACTIVATE</a>
+                <a href="{{ url('activation-link?uuid='.$reservation->guest_information->uuid) }}">CLICK TO ACTIVATE</a>
                 <p>Have questions or need assistance? We're here to help you.</p>
            </td>
+          </div>
 
           @endif
     </div>

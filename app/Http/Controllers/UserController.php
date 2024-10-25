@@ -230,7 +230,7 @@ class UserController extends Controller
                 'status' => $request->password ?   $old_guest ->status == 'active' ? 'active' : 'inactive' : 'inactive'
             ]);
             if($old_guest->status == 'inactive'){
-               $data = $this->sendEmail($old_guest,'Activate Your Account');
+               $this->sendEmail($old_guest,'Activate Your Account');
             }
         }
         if (in_array($request->params, ['create'])) {
@@ -250,7 +250,7 @@ class UserController extends Controller
                 ]);
 
                 if($user->status == 'inactive'){
-                    $data = $this->sendEmail($user,'Activate Your Account');
+                    $this->sendEmail($user,'Activate Your Account');
                  }
             }else{
             $user = GuestInformaion::create([
@@ -266,7 +266,7 @@ class UserController extends Controller
                 'status' => $request->password ? 'inactive' : 'inactive'
             ]);
              if($user->status == 'inactive'){
-                $data = $this->sendEmail($user,'Activate Your Account');
+                 $this->sendEmail($user,'Activate Your Account');
              }
             }
 
@@ -515,7 +515,7 @@ public function forget_password(Request $request){
    }
 
 
-   public function reset_password(Request $request){
+   public function password_update(Request $request){
     $validateUser = Validator::make($request->all(), [
         'email' => 'required|email',
         'password' => 'required',
