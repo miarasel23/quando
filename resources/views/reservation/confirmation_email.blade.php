@@ -45,9 +45,7 @@
             padding: 8px;
         }
         .info {
-            text-align: center; /* Centre-align customer details */
-            margin: 20px 10px;
-            padding-bottom: 10px;
+            text-align: center;
         }
         .footer {
             text-align: center;
@@ -69,9 +67,6 @@
             display: block;
             margin: 0 auto; /* Centre-align all images */
         }
-
-
-
 
         .content p {
             font-size: 16px;
