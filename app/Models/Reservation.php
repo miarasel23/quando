@@ -67,6 +67,14 @@ class Reservation extends Model
     }
 
 
+    private static function generateReservationId()
+    {
+        $letters = strtoupper(Str::random(4));  // Generate 4 random uppercase letters
+        $numbers = str_pad(mt_rand(0, 9999), 4, '0', STR_PAD_LEFT);  // Generate 4 random numbers padded with zeros
+        return $letters . $numbers;
+    }
+
+
 
     protected static function boot()
     {
@@ -75,6 +83,10 @@ class Reservation extends Model
         static::creating(function ($model) {
             if (empty($model->uuid)) {
                 $model->uuid = (string) Str::uuid();
+            }
+
+            if (empty($model->reservation_id)) {
+                $model->reservation_id = self::generateReservationId();
             }
         });
     }

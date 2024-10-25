@@ -14,9 +14,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Laravel\Sanctum\PersonalAccessToken;
 use  Illuminate\Support\Facades\DB;
+use App\Traits\emaiTraits;
 
 class ReservationController extends Controller
 {
+
+    use emaiTraits;
     public function time_hold(Request $request)
     {
 
@@ -150,6 +153,12 @@ class ReservationController extends Controller
                 'day' => $request->day,
 
             ]);
+
+            $reservationDetails = Reservation::where('uuid', $request->reservation_uuid)->with('guest_information', 'table_master', 'restaurant')->first();
+           if(isset($reservationDetails) && !empty($reservationDetails)){
+               $this->sendEmailForReservation($reservationDetails,'Reservation Confirmation');
+           }
+
             return response()->json([
                 'status' => true,
                 'message' => 'Reservation Booked Successfully',

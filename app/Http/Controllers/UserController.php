@@ -468,6 +468,8 @@ public function forget_password(Request $request){
         ], 401);
     }
     $user = GuestInformaion::where('email', $request->email)->first();
+
+
     if (!empty($user)) {
          $this->sendEmailForgetPassword($request,'Forgot password code');
         return response()->json([

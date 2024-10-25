@@ -21,5 +21,5 @@ Auth::routes();
 
 
 Route::get('/email-template', function () {
-    return view('email_template.account_activataion_template');
+    return view('reservation.confirmation_email');
 });
