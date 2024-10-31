@@ -21,36 +21,23 @@ trait emaiTraits {
 
         $mail = new PHPMailer(true);
         try {
-            $mail->isSMTP(); // Set mailer to use SMTP
-            $mail->Host = 'mail.tablebookings.co.uk'; // Specify main SMTP server
-            $mail->SMTPAuth = true; // Enable SMTP authentication
-            $mail->Username = 'reservations@tablebookings.co.uk'; // SMTP username
-            $mail->Password = 'uy!5a8Y47'; // SMTP password
-            $mail->SMTPSecure = 'ssl'; // Enable SSL encryption
-            $mail->Port = 465; // TCP port for SSL
+            $mail->isSMTP();
+            $mail->Host = 'email-smtp.eu-west-2.amazonaws.com';
+            $mail->SMTPAuth = true;
+            $mail->Username = 'AKIA4FDBYMQAVBBEBPPE';
+            $mail->Password = 'BEBqcbr8IM7BPtlFeGYHFpUCXwC580dlUJ8MVHdYNvo2';
+            $mail->SMTPSecure = 'tls'; // or 'STARTTLS'
+            $mail->Port = 587;
+           // $mail->SMTPDebug = 0; // For debugging, remove in production
 
-            // Disable SSL certificate verification (for testing purposes only)
-            $mail->SMTPOptions = array(
-                'ssl' => array(
-                    'verify_peer' => false,
-                    'verify_peer_name' => false,
-                    'allow_self_signed' => true
-                )
-            );
-
-            // Recipients
-            $mail->setFrom('reservations@tablebookings.co.uk', 'Table Bookings');
+            $mail->setFrom('noreply@tablebookings.co.uk', 'Table Bookings');
             $mail->addAddress($request->email, 'Recipient Name');
 
-            // Content
-            $mail->isHTML(true); // Set email format to HTML
+            $mail->isHTML(true);
             $mail->Subject = $subject;
             $mail->Body    = view('email_template.account_activataion_template', compact('request'))->render();
-            //$mail->AltBody = 'This is the plain text version of the email body.';
 
-            // Send the email
-           $mail->send();
-
+            $mail->send();
         } catch (Exception $e) {
             echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
         }
@@ -67,25 +54,17 @@ trait emaiTraits {
         try {
             // Server settings
             $mail->isSMTP();
-            $mail->Host = 'mail.tablebookings.co.uk';
+            $mail->Host = 'email-smtp.eu-west-2.amazonaws.com';
             $mail->SMTPAuth = true;
-            $mail->Username = 'reservations@tablebookings.co.uk';
-            $mail->Password = 'uy!5a8Y47';
-            $mail->SMTPSecure = 'ssl';
-            $mail->Port = 465;
+            $mail->Username = 'AKIA4FDBYMQAVBBEBPPE';
+            $mail->Password = 'BEBqcbr8IM7BPtlFeGYHFpUCXwC580dlUJ8MVHdYNvo2';
+            $mail->SMTPSecure = 'tls'; // or 'STARTTLS'
+            $mail->Port = 587;
+           // $mail->SMTPDebug = 0; // For debugging, remove in production
 
-            // Disable SSL certificate verification (for testing purposes only)
-            $mail->SMTPOptions = [
-                'ssl' => [
-                    'verify_peer' => false,
-                    'verify_peer_name' => false,
-                    'allow_self_signed' => true,
-                ],
-            ];
-
-            // Recipients
-            $mail->setFrom('reservations@tablebookings.co.uk', 'Table Bookings');
+            $mail->setFrom('noreply@tablebookings.co.uk', 'Table Bookings');
             $mail->addAddress($request->email, 'Recipient Name');
+
 
             // Generate OTP and store in cache
             $otp = rand(100000, 999999);
@@ -110,23 +89,24 @@ trait emaiTraits {
 
         try {
             $mail->isSMTP();
-            $mail->Host = 'mail.tablebookings.co.uk';
+            $mail->Host = 'email-smtp.eu-west-2.amazonaws.com';
             $mail->SMTPAuth = true;
-            $mail->Username = 'reservations@tablebookings.co.uk';
-            $mail->Password = 'uy!5a8Y47';
-            $mail->SMTPSecure = 'ssl';
-            $mail->Port = 465;
-            $mail->SMTPOptions = [
-                'ssl' => [
-                    'verify_peer' => false,
-                    'verify_peer_name' => false,
-                    'allow_self_signed' => true,
-                ],
-            ];
+            $mail->Username = 'AKIA4FDBYMQAVBBEBPPE';
+            $mail->Password = 'BEBqcbr8IM7BPtlFeGYHFpUCXwC580dlUJ8MVHdYNvo2';
+            $mail->SMTPSecure = 'tls'; // or 'STARTTLS'
+            $mail->Port = 587;
+           // $mail->SMTPDebug = 0; // For debugging, remove in production
+
+
+
+
+
             $mail->setFrom('reservations@tablebookings.co.uk', 'Table Bookings');
             $mail->addAddress($reservation->guest_information->email, 'Recipient Name');
             $mail->isHTML(true);
+
             $mail->Subject = $subject;
+
             $mail->Body = view('reservation.confirmation_email', compact('reservation'))->render();
             $mail->send();
 
