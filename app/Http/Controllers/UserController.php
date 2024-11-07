@@ -543,5 +543,36 @@ public function forget_password(Request $request){
         ], 404);
      }
     }
+   public function contact_us(Request $request){
+    $validateUser = Validator::make($request->all(), [
+        'name' => 'required|email',
+        'email' => 'required|email',
+        'rest_name' => 'required|rest_name',
+        'post_code' => 'required|post_code',
+        'phone_no' => 'required|phone_no',
+        'message' => 'required',
+    ]);
+    if($validateUser->fails()){
+        return response()->json([
+            'status' => false,
+            'message' => 'validation error',
+            'errors' => $validateUser->errors()
+        ], 401);
+    }
+    $data = $this->sendEmailForEnquiry($request,'Inquiry');
+    if (!empty($data)) {
+
+    return response()->json([
+        'status' => true,
+        'message' => 'Inquiry send successfully'
+     ], 200);
+    }
+     else {
+        return response()->json([
+            'status' => false,
+            'message' => 'Something went wrong'
+        ], 404);
+     }
+    }
 
 }

@@ -70,7 +70,7 @@ class FunctionController extends Controller
            $data = $this->menu_delete($request->uuid);
            return $data;
         }elseif(in_array($request->params, ['create'])){
-        $rest_data = Restaurant::where('uuid', $request->rest_uuid)->where('status', 'active')->first();
+        $rest_data = Restaurant::where('uuid', $request->rest_uuid)->first();
         if(!empty($rest_data)){
             $menu_catergory = MenuCatergory::where('uuid', $request->category_uuid)->where('status', 'active')->first();
             if(!empty( $request->global_description)){

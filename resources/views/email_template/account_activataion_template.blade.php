@@ -89,7 +89,7 @@
     <table>
         <tr>
             <td class="header">
-                <h1>Activate Your Account</h1>
+                <h1>Activate Your Account </h1>
             </td>
         </tr>
         <tr>
