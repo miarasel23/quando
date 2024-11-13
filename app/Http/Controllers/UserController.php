@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 use App\Models\Restaurant;
 use App\Models\GuestInformaion;
+use App\Models\Enquiry;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Laravel\Sanctum\PersonalAccessToken;
@@ -545,12 +546,13 @@ public function forget_password(Request $request){
     }
    public function contact_us(Request $request){
     $validateUser = Validator::make($request->all(), [
-        'name' => 'required|email',
+        'first_name' => 'required',
+        'last_name' => 'required',
         'email' => 'required|email',
-        'rest_name' => 'required|rest_name',
-        'post_code' => 'required|post_code',
-        'phone_no' => 'required|phone_no',
-        'message' => 'required',
+        'phone' => 'required',
+        'post_code' => 'required',
+        'city' => 'required',
+        'restaurant_name' => 'required',
     ]);
     if($validateUser->fails()){
         return response()->json([
@@ -560,12 +562,23 @@ public function forget_password(Request $request){
         ], 401);
     }
     $data = $this->sendEmailForEnquiry($request,'Inquiry');
-    if (!empty($data)) {
 
-    return response()->json([
-        'status' => true,
-        'message' => 'Inquiry send successfully'
-     ], 200);
+    $data_insert = Enquiry::create([
+        'first_name' => $request->first_name,
+        'last_name' => $request->last_name,
+        'email' => $request->email,
+        'phone' => $request->phone,
+        'post_code' => $request->post_code,
+        'city' => $request->city,
+        'restaurant_name' => $request->restaurant_name,
+    ]);
+
+
+    if($data_insert){
+        return response()->json([
+            'status' => true,
+            'message' => 'Inquiry send successfully',
+         ], 200);
     }
      else {
         return response()->json([
@@ -574,5 +587,6 @@ public function forget_password(Request $request){
         ], 404);
      }
     }
+
 
 }
