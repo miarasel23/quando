@@ -21,7 +21,6 @@ class Enquiry extends Model
         'email',
         'phone',
         'restaurant_name',
-        'city',
         'post_code',
         'reservation_name',
         'message',

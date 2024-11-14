@@ -551,7 +551,6 @@ public function forget_password(Request $request){
         'email' => 'required|email',
         'phone' => 'required',
         'post_code' => 'required',
-        'city' => 'required',
         'restaurant_name' => 'required',
         'message' => 'required',
     ]);
@@ -570,7 +569,6 @@ public function forget_password(Request $request){
         'email' => $request->email,
         'phone' => $request->phone,
         'post_code' => $request->post_code,
-        'city' => $request->city,
         'restaurant_name' => $request->restaurant_name,
         'message' => $request->message,
     ]);

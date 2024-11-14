@@ -19,7 +19,6 @@ return new class extends Migration
             $table->string('email');
             $table->string('phone');
             $table->string('restaurant_name');
-            $table->string('city');
             $table->string('post_code');
             $table->text('message');
             $table->timestamps();
