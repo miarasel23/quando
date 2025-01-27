@@ -228,11 +228,18 @@ class UserController extends Controller
                 'country' => $request->country,
                 'post_code' => $request->post_code,
                 'password' => Hash::make($request->password),
-                'status' => $request->password ?   $old_guest ->status == 'active' ? 'active' : 'inactive' : 'inactive'
+                'status' => $request->password ?   $old_guest ->status == 'active' ? 'active' : 'active' : 'active'
             ]);
-            if($old_guest->status == 'inactive'){
-               $this->sendEmail($old_guest,'Activate Your Account');
-            }
+           // if($old_guest->status == 'inactive'){
+             //  $this->sendEmail($old_guest,'Activate Your Account');
+         //   }
+
+
+            return response()->json([
+                'status' => true,
+                'message' => 'This is already a registered user',
+            ], 200);
+
         }
         if (in_array($request->params, ['create'])) {
             $user = GuestInformaion::where('email', $request->email)->orWhere('phone', $request->phone)->first();
