@@ -24,6 +24,7 @@ class Enquiry extends Model
         'post_code',
         'reservation_name',
         'message',
+        'params',
     ];
 
     public function getActivitylogOptions(): LogOptions

@@ -77,6 +77,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             Route::get('menu-catergory', [FunctionController::class, 'menu_catergory']);
             Route::post('menus', [FunctionController::class, 'menu_create']);
 
+            Route::post('menus-photot-upload', [FunctionController::class, 'menu_photo']);
+
             // ************************* photos ***********************************
             Route::post('rest-photos', [FunctionController::class, 'rest_photo']);
 

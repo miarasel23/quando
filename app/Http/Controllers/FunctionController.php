@@ -15,6 +15,7 @@ use App\Models\Review;
 use App\Models\SectionDescription;
 use App\Models\TableMaster;
 use App\Models\ResMenu;
+use App\Models\MenuImage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Laravel\Sanctum\PersonalAccessToken;
@@ -467,4 +468,125 @@ class FunctionController extends Controller
             ]);
         }
     }
+
+
+
+
+
+
+        public function menu_photo(Request $request){
+            if(in_array($request->params, ['update','delete'])){
+            $old_photo = MenuImage::where('uuid', $request->uuid)->first();
+            }
+            $validateUser = Validator::make($request->all(), [
+                'rest_uuid' => in_array($request->params, ['update','create','info']) ? 'required:exists:restaurants,uuid' : 'nullable|string',
+                'image' =>  in_array($request->params, ['update','create']) ? 'required|image|mimes:jpeg,png,jpg,gif,svg,webp|max:100000' : 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:100000',
+                'status'=> in_array($request->params, ['update','create']) ? 'required|string' : 'nullable|max:120',
+                'params'=> 'required|string',
+                'uuid' =>  in_array($request->params, ['update','delete']) ? 'required:exists:photos,uuid' : 'nullable',
+            ]);
+            if ($validateUser->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'validation error',
+                    'errors' => $validateUser->errors()
+                ], 401);
+            }
+        $rest_data = Restaurant::where('uuid', $request->rest_uuid)->where('status', 'active')->first();
+        if(!empty($rest_data)){
+                if(in_array($request->params, ['create'])){
+                $data = MenuImage::create([
+                    'image' => $request->hasFile('image') ? $this->verifyAndUpload('image',$request['image'], null, null) : null,
+                    'restaurant_id' => $rest_data->id,
+                    'status'=> $request->status
+                ]);
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Photo Added Successfully',
+                    'data' => $data
+                ], 200);
+
+            }elseif(in_array($request->params, ['update'])){
+                $data = $this->menu_photo_update($request);
+                return $data;
+            }elseif(in_array($request->params, ['delete'])){
+                $data = $this->menu_photo_delete($request->uuid);
+                return $data;
+            }elseif(in_array($request->params, ['info'])){
+                $data = $this->menu_photo_info($rest_data->uuid);
+                return $data;
+            }else{
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Restaurant Not Found',
+                    'data' => []
+                ], 200);
+            }
+        }else{
+            return response()->json([
+                'status' => false,
+                'message' => 'Restaurant Not Found',
+                'data' => []
+            ], 200);
+        }
+
+    }
+
+    public function menu_photo_update(Request $request){
+
+        $data = MenuImage::where('uuid', $request->uuid)->first();
+        if(!empty($data)){
+            if($request->hasFile('image')){
+                $data->image =  $this->updateImage('image',$request->image,  $data->image,null, null);
+            }
+            $data->status = $request->status;
+            $data->save();
+            return response()->json([
+                'status' => true,
+                'message' => 'Photo Updated Successfully',
+                'data' => $data
+            ], 200);
+        }else{
+            return response()->json([
+                'status' => false,
+                'message' => 'Photo Not Found',
+                'data' => []
+            ], 200);
+        }
+    }
+
+    public function menu_photo_info($uuid){
+        $rest_data = Restaurant::where('uuid', $uuid)->first();
+        $data = MenuImage::where('restaurant_id', $rest_data->id)->get();
+        if(!empty($data)){
+            return response()->json([
+                'status' => true,
+                'message' => 'Photo info',
+                'data' => $data
+            ]);
+        }else{
+            return response()->json([
+                'status' => false,
+                'message' => 'Photo not found',
+            ]);
+        }
+    }
+
+    public function menu_photo_delete($uuid){
+        $data = MenuImage::where('uuid', $uuid)->first();
+        if(!empty($data)){
+            $this->deleteImage($data->image);
+            $data->delete();
+            return response()->json([
+                'status' => true,
+                'message' => 'Photo Deleted Successfully',
+            ], 200);
+        }else{
+            return response()->json([
+                'status' => false,
+                'message' => 'Photo Not Found',
+            ], 200);
+        }
+    }
+
 }
