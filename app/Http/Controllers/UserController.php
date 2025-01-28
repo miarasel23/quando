@@ -559,7 +559,8 @@ public function forget_password(Request $request){
         'phone' => 'required',
         'post_code' => 'required',
         'restaurant_name' => 'required',
-        'message' => 'required',
+        'message' =>  $request->params == 'contact_us' ? 'required' : 'nullable',
+        'params' => 'required',
     ]);
     if($validateUser->fails()){
         return response()->json([
@@ -578,8 +579,12 @@ public function forget_password(Request $request){
         'post_code' => $request->post_code,
         'restaurant_name' => $request->restaurant_name,
         'message' => $request->message,
+        'params' => $request->params,
     ]);
-    $data = $this->sendEmailForEnquiry($request,'Inquiry');
+    if($data_insert && $request->params == 'contact_us'){
+     $data = $this->sendEmailForEnquiry($request,'Inquiry');
+    }
+
     if($data_insert){
         return response()->json([
             'status' => true,

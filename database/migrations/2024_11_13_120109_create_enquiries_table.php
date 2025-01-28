@@ -20,7 +20,8 @@ return new class extends Migration
             $table->string('phone');
             $table->string('restaurant_name');
             $table->string('post_code');
-            $table->text('message');
+            $table->text('message')->nullable();
+            $table->string('params');
             $table->timestamps();
         });
     }
