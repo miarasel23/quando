@@ -173,10 +173,8 @@ class UserController extends Controller
         if(in_array($request->params, ['create'])){
             $old_guest_active = GuestInformaion::where([
                 ['phone', $request->phone],
-                ['status','=', 'active'],
                 ])->orWhere([
                     ['email', $request->email],
-                    ['status','=', 'active'],
                     ])->first();
                 if(!empty($old_guest_active)){
                     return response()->json([
