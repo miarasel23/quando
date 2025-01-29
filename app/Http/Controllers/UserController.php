@@ -41,20 +41,20 @@ class UserController extends Controller
         $validateUser = Validator::make($request->all(), [
                 'name' =>  in_array($request->params, ['info']) ? 'nullable' : 'required',
                 'email' => in_array($request->params, ['update']) ?
-                'required|email|unique:restaurants,email,' . $old_user->id :
+                'required|email|unique:users,email,' . $old_user->id :
                 (in_array($request->params, ['info']) ?
-                'nullable' :'required|email|unique:restaurants'),
+                'nullable' :'required|email|unique:users'),
                 'res_uuid' =>  in_array($request->params, [ 'info']) ? 'nullable' :  'required',
                 'user_type' =>  in_array($request->params, [ 'info']) ? 'nullable' :  'required',
                 'params' => 'required',
                 'phone' =>  in_array($request->params, ['update']) ?  [
                     'required',
-                    'unique:restaurants,phone,' . $old_user->id,
+                    'unique:users,phone,' . $old_user->id,
                     'regex:/^(\+?\d{1,3}[-.\s]?)?\d{10}$/',
                 ]: (in_array($request->params, ['info']) ?
                 'nullable' : [
                     'required',
-                    'unique:restaurants',
+                    'unique:users',
                     'regex:/^(\+?\d{1,3}[-.\s]?)?\d{10}$/' ,
                 ]),
                 'password' =>  in_array($request->params, [ 'info']) ? 'nullable' : (  in_array($request->params, [ 'update']) ? 'required' : 'nullable'),
