@@ -475,6 +475,15 @@ public function forget_password(Request $request){
             'errors' => $validateUser->errors()
         ], 401);
     }
+    $otp = Cache::get($request->email);
+
+    Cache::set($request->email, $otp+1, Carbon::now()->addMinutes(60));
+    if($otp >= 5){
+        return response()->json([
+            'status' => false,
+            'message' => 'You have reached the limit'
+        ], 404);
+    }
     $user = GuestInformaion::where('email', $request->email)->first();
 
 
