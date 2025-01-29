@@ -179,7 +179,7 @@ class UserController extends Controller
                     ])->first();
                 if(!empty($old_guest_active)){
                     return response()->json([
-                        'status' => true,
+                        'status' => false,
                         'message' => 'This is already a registered user',
                         'data' => $old_guest_active
                     ], 200);
