@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('res_uuid');
             $table->enum('user_type', ['admin', 'super_admin', 'staff']);
             $table->string('email')->unique();
+            $table->string('phone');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->enum('status', ['active', 'inactive'])->default('active');

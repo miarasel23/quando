@@ -22,6 +22,7 @@ Route::prefix('v1/user/')->group(function () {
     Route::get('restaurant',[AdminController::class,'restaurant_list']);
 
     Route::get('restaurant-top-review',[AdminController::class,'restaurant_top_review']);
+    Route::post('menus-photo-upload', [FunctionController::class, 'menu_photo']);
 
 
     Route::get('search-restaurant',[AdminController::class,'restaurant_search_list']);
@@ -77,7 +78,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             Route::get('menu-catergory', [FunctionController::class, 'menu_catergory']);
             Route::post('menus', [FunctionController::class, 'menu_create']);
 
-            Route::post('menus-photo-upload', [FunctionController::class, 'menu_photo']);
+          //  Route::post('menus-photo-upload', [FunctionController::class, 'menu_photo']);
 
             // ************************* photos ***********************************
             Route::post('rest-photos', [FunctionController::class, 'rest_photo']);
