@@ -313,7 +313,7 @@ class ReservationController extends Controller
                 ], 404);
             }
         } elseif (in_array($request->params, ['checkout'])) {
-            if ($data != null && $data->status == 'checkin') {
+            if ($data != null && $data->status == 'check_in') {
                 $data->check_out_time = $request->checkout_time;
                 $data->status = 'completed';
                 $data->save();
