@@ -15,6 +15,7 @@ use Laravel\Sanctum\PersonalAccessToken;
 use  Illuminate\Support\Facades\DB;
 use App\Traits\emaiTraits;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Carbon;
 class UserController extends Controller
 {
 
