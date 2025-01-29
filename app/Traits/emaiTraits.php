@@ -16,6 +16,9 @@ trait emaiTraits {
 
 
 
+    protected $emailUserName = 'tablebookings';
+    protected $emailPassword = 'm8h6DNDV2H4$cAq';
+
     public function sendEmail( $request, $subject){
 
 
@@ -32,11 +35,11 @@ trait emaiTraits {
 
             $mail->Host = 'outbound.mailhop.org';
             $mail->SMTPAuth = true;
-            $mail->Username = 'tablebookings';
-            $mail->Password = 'm8h6DNDV2H4$cAq';
+            $mail->Username =$this->emailUserName;
+            $mail->Password = $this->emailPassword;
             $mail->SMTPSecure = 'tls'; // or 'STARTTLS'
             $mail->Port = 587;
-           // $mail->SMTPDebug = 0; // For debugging, remove in production
+           $mail->SMTPDebug = 0; // For debugging, remove in production
 
             $mail->setFrom('noreply@tablebookings.co.uk', 'Table Bookings');
             $mail->addAddress($request->email, 'Recipient Name');
@@ -64,11 +67,11 @@ trait emaiTraits {
             $mail->isSMTP();
             $mail->Host = 'outbound.mailhop.org';
             $mail->SMTPAuth = true;
-            $mail->Username = 'tablebookings';
-            $mail->Password = 'm8h6DNDV2H4$cAq';
+            $mail->Username =$this->emailUserName;
+            $mail->Password = $this->emailPassword;
             $mail->SMTPSecure = 'tls'; // or 'STARTTLS'
             $mail->Port = 587;
-           // $mail->SMTPDebug = 0; // For debugging, remove in production
+            $mail->SMTPDebug = 0; // For debugging, remove in production
 
             $mail->setFrom('noreply@tablebookings.co.uk', 'Table Bookings');
             $mail->addAddress($request->email, 'Recipient Name');
@@ -99,11 +102,11 @@ trait emaiTraits {
             $mail->isSMTP();
             $mail->Host = 'outbound.mailhop.org';
             $mail->SMTPAuth = true;
-            $mail->Username = 'tablebookings';
-            $mail->Password = 'm8h6DNDV2H4$cAq';
+            $mail->Username =$this->emailUserName;
+            $mail->Password = $this->emailPassword;
             $mail->SMTPSecure = 'tls'; // or 'STARTTLS'
             $mail->Port = 587;
-           // $mail->SMTPDebug = 0; // For debugging, remove in production
+            $mail->SMTPDebug = 0; // For debugging, remove in production
 
 
 
@@ -132,10 +135,11 @@ trait emaiTraits {
             $mail->isSMTP();
             $mail->Host = 'outbound.mailhop.org';
             $mail->SMTPAuth = true;
-            $mail->Username = 'tablebookings';
-            $mail->Password = 'm8h6DNDV2H4$cAq';
+            $mail->Username =$this->emailUserName;
+            $mail->Password = $this->emailPassword;
             $mail->SMTPSecure = 'tls'; // or 'STARTTLS'
             $mail->Port = 587;
+            $mail->SMTPDebug = 0; // For debugging, remove in production
             $mail->setFrom('reservations@tablebookings.co.uk', 'Table Bookings');
             $mail->addAddress($data->email, $data->first_name.' '.$data->last_name);
             $mail->isHTML(true);
