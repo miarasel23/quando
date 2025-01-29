@@ -190,18 +190,18 @@ class UserController extends Controller
             'last_name' => 'required',
             'phone' =>  in_array($request->params, ['update']) ?  [
                 'required',
-                'unique:restaurants,phone,' . $old_guest->id,
+                'unique:guest_informaions,phone,' . $old_guest->id,
                 'regex:/^(\+?\d{1,3}[-.\s]?)?\d{10}$/',
             ]: (in_array($request->params, ['info']) ?
             'nullable' : [
                 'required',
-                'unique:restaurants',
+                'unique:guest_informaions',
                 'regex:/^(\+?\d{1,3}[-.\s]?)?\d{10}$/' ,
             ]),
             'email' => in_array($request->params, ['update']) ?
-                'required|email|unique:restaurants,email,' . $old_guest->id :
+                'required|email|unique:guest_informaions,email,' . $old_guest->id :
                 (in_array($request->params, ['info']) ?
-                'nullable' :'required|email|unique:restaurants'),
+                'nullable' :'required|email|unique:guest_informaions'),
             'address' => 'nullable|string',
             'city' => 'nullable|string',
             'country' => 'nullable|string',
