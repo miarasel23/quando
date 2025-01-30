@@ -348,15 +348,15 @@ class UserController extends Controller
 
                         }
                         if($count < 3){
-                            $this->sendEmail($old_guest_active,'Activate Your Account');
+                            $this->sendEmail($user,'Activate Your Account');
                             EmailSendValidation::create([
-                                'email' => $old_guest_active->email,
+                                'email' => $user->email,
                                 'limit' => 1,
                                 'status'=>'success',
                             ]);
                         }else{
                             EmailSendValidation::create([
-                                'email' => $old_guest_active->email,
+                                'email' => $user->email,
                                 'limit' => 1,
                                 'status'=>'failed',
                             ]);
