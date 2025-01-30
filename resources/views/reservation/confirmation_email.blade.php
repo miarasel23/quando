@@ -49,7 +49,7 @@
         }
         .footer {
             text-align: center;
-            background-color: #3d4a49;
+            background-color: #ffffff;
             color: white;
             padding: 20px;
             font-size: 14px;
