@@ -10,6 +10,7 @@ use App\Models\Restaurant;
 use App\Models\Reservation;
 use App\Models\GuestInformaion;
 use App\Models\TableMaster;
+use App\Models\EmailSendValidation;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\Rule;
