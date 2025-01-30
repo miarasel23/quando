@@ -145,6 +145,9 @@
                 <p> Hi, <strong>{{ ucwords($reservation->guest_information->first_name) }} {{ ucwords($reservation->guest_information->last_name) }} </strong> Please activate your account. </p>
                 <a href="{{ url('activation-link?uuid='.$reservation->guest_information->uuid) }}">CLICK TO ACTIVATE</a>
                 <p>Have questions or need assistance? We're here to help you.</p>
+                @if ($one_time_password != null)
+                 <p class="header">Your password is : {{$one_time_password}} </p>
+                @endif
            </td>
           </div>
 
