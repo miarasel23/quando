@@ -132,13 +132,13 @@
                 <p>{{ $reservation->guest_information->phone }}</p>
             </div>
         </div>
-        <div class="footer">
+        {{-- <div class="footer">
             <div class="app-buttons">
                 <a href="{{url('logo.png')}}"><img src="{{ url('logo.png') }}" alt="Tablebookings.co.uk"></a>
             </div>
             <p>Thank you for your reservation with <strong>{{ ucwords($reservation->restaurant->name) }}</strong>.</p>
             <p>Tel: {{ $reservation->restaurant->phone }}</p>
-        </div>
+        </div> --}}
           @if ($reservation->guest_information->status == 'inactive')
           <div class="content" style="text-align:center">
            <td >
@@ -146,7 +146,7 @@
                 <a href="{{ url('activation-link?uuid='.$reservation->guest_information->uuid) }}">CLICK TO ACTIVATE</a>
                 <p>Have questions or need assistance? We're here to help you.</p>
                 @if ($one_time_password != null)
-                 <p class="header" style="text-align:center;background-color:#e63946;text-color:rgb(19, 1, 1)">Your password is : {{$one_time_password}} </p>
+                 <p  style="text-align:center;background-color:#e63946;text-color:rgb(19, 1, 1)">Your password is : {{$one_time_password}} </p>
                 @endif
            </td>
           </div>
