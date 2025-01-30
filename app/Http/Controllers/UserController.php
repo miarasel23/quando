@@ -216,11 +216,23 @@ class UserController extends Controller
                                 }
                             }
                      }
-                    return response()->json([
-                        'status' => false,
-                        'message' => 'This is already a registered user',
-                        'data' => $old_guest_active
-                    ], 200);
+
+
+                     if($old_guest_active ->status == 'active' ){
+                        return response()->json([
+                            'status' => true,
+                            'message' => 'This is already a registered user',
+                            'data' => $old_guest_active
+                        ], 200);
+
+                     }else{
+                        return response()->json([
+                            'status' => false,
+                            'message' => 'This is already a registered user',
+                            'data' => $old_guest_active
+                        ], 200);
+                     }
+
             }
         }
         $validateUser = Validator::make($request->all(), [
@@ -331,7 +343,7 @@ class UserController extends Controller
                     'city' => $request->city,
                     'country' => $request->country,
                     'post_code' => $request->post_code,
-                    'password' =>  $request->register_type=='register' ? Hash::make($request->password) : Hash::make($one_time_password),
+                    'password' =>  $request->register_type =='register' ? Hash::make($request->password) : Hash::make($one_time_password),
                     'status' =>  'inactive'
                 ]);
 
