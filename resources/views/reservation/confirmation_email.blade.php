@@ -49,8 +49,19 @@
         }
         .footer {
             text-align: center;
-            padding: 15px;
-            background-color: #f4f4f4;
+            background-color: #3d4a49;
+            color: white;
+            padding: 20px;
+            font-size: 14px;
+        }
+
+        .footer p {
+            margin: 5px 0;
+        }
+
+        .footer a {
+            color: white;
+            text-decoration: none;
         }
         .app-buttons img {
             max-width: 120px;
