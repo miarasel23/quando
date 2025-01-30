@@ -180,6 +180,15 @@ class ReservationController extends Controller
                                 'limit' => 1,
                                 'status'=>'success',
                             ]);
+
+                            $this->sendEmailForReservationOwner($reservationDetails,'Reservation Confirmation',$one_time_password);
+                            EmailSendValidation::create([
+                                'email' => $reservationDetails->restaurant->email,
+                                'limit' => 1,
+                                'status'=>'success',
+                            ]);
+
+
                         }else{
                             EmailSendValidation::create([
                                 'email' => $user->email,
@@ -188,6 +197,8 @@ class ReservationController extends Controller
                             ]);
                         }
                     }
+
+
              }
            }
 
