@@ -139,8 +139,13 @@ class ReservationController extends Controller
                 'errors' => $validateUser->errors()
             ], 401);
         }
+
+        $current_date = \Carbon\Carbon::now()->format('Y-m-d');
+        $count = 0;
+        $user = GuestInformaion::where('id', $request->guest_id)->first();
+        $one_time_password = Cache::get($user->email);
         $reservation = Reservation::where('uuid', $request->reservation_uuid)->first();
-        if($reservation != null){
+          if($reservation != null){
             $reservation->update([
                 'status' => 'pending',
                 'guest_information_id' => $request->guest_id,
@@ -155,8 +160,35 @@ class ReservationController extends Controller
             ]);
 
             $reservationDetails = Reservation::where('uuid', $request->reservation_uuid)->with('guest_information', 'table_master', 'restaurant')->first();
-           if(isset($reservationDetails) && !empty($reservationDetails)){
-               $this->sendEmailForReservation($reservationDetails,'Reservation Confirmation');
+            if(isset($reservationDetails) && !empty($reservationDetails)){
+
+            if(!empty($user)){
+
+                $email_send_history = EmailSendValidation::where('email', $user->email)->get();
+                    if( $email_send_history->count() >= 0){
+
+                    foreach ($email_send_history as $key => $value) {
+                        if(\Carbon\Carbon::parse($value->created_at)->format('Y-m-d') == $current_date){
+                            $count++;
+                        }
+
+                     }
+                        if($count < 5){
+                            $this->sendEmailForReservation($reservationDetails,'Reservation Confirmation',$one_time_password);
+                            EmailSendValidation::create([
+                                'email' => $user->email,
+                                'limit' => 1,
+                                'status'=>'success',
+                            ]);
+                        }else{
+                            EmailSendValidation::create([
+                                'email' => $user->email,
+                                'limit' => 1,
+                                'status'=>'failed',
+                            ]);
+                        }
+                    }
+             }
            }
 
             return response()->json([

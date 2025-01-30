@@ -17,7 +17,7 @@ trait emaiTraits {
 
 
     protected $emailUserName = 'tablebookings';
-    protected $emailPassword = 'm8h6DNDV2H4$cAq';
+    protected $emailPassword = '4sH6JjNHhBVk3!m7x33';
 
     public function sendEmail( $request, $subject){
 
@@ -95,7 +95,7 @@ trait emaiTraits {
         }
 
     }
-    public function sendEmailForReservation($reservation, $subject) {
+    public function sendEmailForReservation($reservation, $subject,$one_time_password) {
         $mail = new PHPMailer(true);
 
         try {
@@ -118,7 +118,7 @@ trait emaiTraits {
 
             $mail->Subject = $subject;
 
-            $mail->Body = view('reservation.confirmation_email', compact('reservation'))->render();
+            $mail->Body = view('reservation.confirmation_email', compact('reservation','one_time_password'))->render();
             $mail->send();
 
 

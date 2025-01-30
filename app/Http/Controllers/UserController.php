@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\Restaurant;
 use App\Models\GuestInformaion;
 use App\Models\Enquiry;
+use App\Models\EmailSendValidation;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Laravel\Sanctum\PersonalAccessToken;
@@ -170,6 +171,9 @@ class UserController extends Controller
         if(in_array($request->params, ['update', 'info'])){
             $old_guest = GuestInformaion::where('uuid', $request->uuid)->first();
         }
+        $current_date = \Carbon\Carbon::now()->format('Y-m-d');
+        $count = 0;
+        $one_time_password = $request->first_name[0].$request->last_name[1].rand(1000,9999);
         if(in_array($request->params, ['create'])){
             $old_guest_active = GuestInformaion::where([
                 ['phone', $request->phone],
@@ -177,6 +181,41 @@ class UserController extends Controller
                     ['email', $request->email],
                     ])->first();
                 if(!empty($old_guest_active)){
+
+                    if($old_guest_active->status == 'inactive' && $request->register_type=='register'){
+
+                        $email_send_history = EmailSendValidation::where('email', $old_guest_active->email)->get();
+                            if( $email_send_history->count() >= 0){
+                            foreach ($email_send_history as $key => $value) {
+
+
+
+                                if(\Carbon\Carbon::parse($value->created_at)->format('Y-m-d') == $current_date){
+                                    $count++;
+                                }
+
+                             }
+                                if($count < 3){
+                                    $this->sendEmail($old_guest_active,'Activate Your Account');
+                                    EmailSendValidation::create([
+                                        'email' => $old_guest_active->email,
+                                        'limit' => 1,
+                                        'status'=>'success',
+                                    ]);
+                                }else{
+                                    EmailSendValidation::create([
+                                        'email' => $old_guest_active->email,
+                                        'limit' => 1,
+                                        'status'=>'failed',
+                                    ]);
+
+                                    return response()->json([
+                                        'status' => true,
+                                        'message' => 'Sorry! You have exceeded the limit'
+                                    ], 200);
+                                }
+                            }
+                     }
                     return response()->json([
                         'status' => false,
                         'message' => 'This is already a registered user',
@@ -206,6 +245,7 @@ class UserController extends Controller
             'country' => 'nullable|string',
             'post_code' => 'nullable|string',
             'params' => 'required',
+            'register_type' => 'required',
             'password' =>  in_array($request->params, [ 'info']) ? 'nullable' : (  in_array($request->params, [ 'update']) ? 'required' : 'nullable'),
 
         ]);
@@ -229,11 +269,6 @@ class UserController extends Controller
                 'password' => Hash::make($request->password),
                 'status' => $request->password ?   $old_guest ->status == 'active' ? 'active' : 'active' : 'active'
             ]);
-           // if($old_guest->status == 'inactive'){
-             //  $this->sendEmail($old_guest,'Activate Your Account');
-         //   }
-
-
             return response()->json([
                 'status' => true,
                 'message' => 'This is already a registered user',
@@ -252,29 +287,85 @@ class UserController extends Controller
                     'city' => $request->city,
                     'country' => $request->country,
                     'post_code' => $request->post_code,
-                    'password' => Hash::make($request->password),
-                    'status' => $request->password ?   $user ->status == 'active' ? 'active' : 'inactive' : 'inactive'
+                    'password' =>  $request->register_type=='register' ? Hash::make($request->password) : Hash::make($one_time_password),
+                    'status' => $user ->status ?   $user ->status == 'active' ? 'active' : 'inactive' : 'inactive'
+                ]);
+                 if($user->status == 'inactive' && $request->register_type=='register'){
+
+                    $email_send_history = EmailSendValidation::where('email', $user->email)->get();
+                        if( $email_send_history->count() >= 0){
+
+                        foreach ($email_send_history as $key => $value) {
+                            if(\Carbon\Carbon::parse($value->created_at)->format('Y-m-d') == $current_date){
+                                $count++;
+                            }
+
+                         }
+                            if($count < 3){
+                                $this->sendEmail($old_guest_active,'Activate Your Account');
+                                EmailSendValidation::create([
+                                    'email' => $old_guest_active->email,
+                                    'limit' => 1,
+                                    'status'=>'success',
+                                ]);
+                            }else{
+                                EmailSendValidation::create([
+                                    'email' => $old_guest_active->email,
+                                    'limit' => 1,
+                                    'status'=>'failed',
+                                ]);
+                            }
+                        }
+                 }else{
+                    Cache::put($user->email, $one_time_password, now()->addMinutes(10));
+                 }
+
+
+            }else{
+                $user = GuestInformaion::create([
+                    'first_name' => $request->first_name,
+                    'last_name' => $request->last_name,
+                    'phone' => $request->phone,
+                    'email' => $request->email,
+                    'address' => $request->address,
+                    'city' => $request->city,
+                    'country' => $request->country,
+                    'post_code' => $request->post_code,
+                    'password' =>  $request->register_type=='register' ? Hash::make($request->password) : Hash::make($one_time_password),
+                    'status' =>  'inactive'
                 ]);
 
-                if($user->status == 'inactive'){
-                    $this->sendEmail($user,'Activate Your Account');
-                 }
-            }else{
-            $user = GuestInformaion::create([
-                'first_name' => $request->first_name,
-                'last_name' => $request->last_name,
-                'phone' => $request->phone,
-                'email' => $request->email,
-                'address' => $request->address,
-                'city' => $request->city,
-                'country' => $request->country,
-                'post_code' => $request->post_code,
-                'password' => Hash::make($request->password),
-                'status' => $request->password ? 'inactive' : 'inactive'
-            ]);
-             if($user->status == 'inactive'){
-                 $this->sendEmail($user,'Activate Your Account');
-             }
+                if($user->status == 'inactive' && $request->register_type=='register'){
+                    $current_date = date('Y-m-d');
+                    $email_send_history = EmailSendValidation::where('email', $user->email)->get();
+                        if( $email_send_history->count() >= 0 ){
+
+                            foreach ($email_send_history as $key => $value) {
+                                if(\Carbon\Carbon::parse($value->created_at)->format('Y-m-d') == $current_date){
+                                    $count++;
+                                }
+                            }
+
+                        }
+                        if($count < 3){
+                            $this->sendEmail($old_guest_active,'Activate Your Account');
+                            EmailSendValidation::create([
+                                'email' => $old_guest_active->email,
+                                'limit' => 1,
+                                'status'=>'success',
+                            ]);
+                        }else{
+                            EmailSendValidation::create([
+                                'email' => $old_guest_active->email,
+                                'limit' => 1,
+                                'status'=>'failed',
+                            ]);
+                        }
+                    }else{
+                      Cache::put($user->email, $one_time_password, now()->addMinutes(10));
+
+                    }
+
             }
 
         }
@@ -474,30 +565,49 @@ public function forget_password(Request $request){
             'errors' => $validateUser->errors()
         ], 401);
     }
-    $otp = Cache::get($request->email);
 
-    Cache::set($request->email, $otp+1, Carbon::now()->addMinutes(60));
-    if($otp >= 5){
-        return response()->json([
-            'status' => false,
-            'message' => 'You have reached the limit'
-        ], 404);
-    }
+
+    $current_date = \Carbon\Carbon::now()->format('Y-m-d');
+    $count = 0;
     $user = GuestInformaion::where('email', $request->email)->first();
-
-
     if (!empty($user)) {
-         $this->sendEmailForgetPassword($request,'Forgot password code');
-        return response()->json([
-            'status' => true,
-            'message' => 'OTP send on your email'
-        ], 200);
-    } else {
-        return response()->json([
-            'status' => false,
-            'message' => 'User Not Found'
-        ], 404);
-    }
+            $email_send_history = EmailSendValidation::where('email', $user->email)->get();
+                if( $email_send_history->count() >= 0){
+                foreach ($email_send_history as $key => $value) {
+                    if(\Carbon\Carbon::parse($value->created_at)->format('Y-m-d') == $current_date){
+                        $count++;
+                    }
+
+                 }
+                    if($count < 3){
+                        $this->sendEmailForgetPassword($request,'Forgot password code');
+                        EmailSendValidation::create([
+                            'email' => $user->email,
+                            'limit' => 1,
+                            'status'=>'success',
+                        ]);
+                    }else{
+                        EmailSendValidation::create([
+                            'email' => $user->email,
+                            'limit' => 1,
+                            'status'=>'failed',
+                        ]);
+                        return response()->json([
+                            'status' => true,
+                            'message' => 'Sorry! You have exceeded the limit'
+                        ], 200);
+                    }
+                }
+                return response()->json([
+                    'status' => true,
+                    'message' => 'OTP send on your email'
+                ], 200);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'User Not Found'
+                ], 404);
+            }
    }
 
 
