@@ -49,19 +49,8 @@
         }
         .footer {
             text-align: center;
-            background-color: #ffffff;
-            color: white;
-            padding: 20px;
-            font-size: 14px;
-        }
-
-        .footer p {
-            margin: 5px 0;
-        }
-
-        .footer a {
-            color: white;
-            text-decoration: none;
+            padding: 15px;
+            background-color: #f4f4f4;
         }
         .app-buttons img {
             max-width: 120px;
@@ -157,7 +146,7 @@
                 <a href="{{ url('activation-link?uuid='.$reservation->guest_information->uuid) }}">CLICK TO ACTIVATE</a>
                 <p>Have questions or need assistance? We're here to help you.</p>
                 @if ($one_time_password != null)
-                 <p class="header" style="background-color: #d67317!important;">Your password is : {{$one_time_password}} </p>
+                 <p class="header" style="text-align:center;background-color:#e63946;text-color:rgb(19, 1, 1)">Your password is : {{$one_time_password}} </p>
                 @endif
            </td>
           </div>
