@@ -157,7 +157,7 @@
                 <a href="{{ url('activation-link?uuid='.$reservation->guest_information->uuid) }}">CLICK TO ACTIVATE</a>
                 <p>Have questions or need assistance? We're here to help you.</p>
                 @if ($one_time_password != null)
-                 <p class="header">Your password is : {{$one_time_password}} </p>
+                 <p class="header" style="background-color: #d67317!important;">Your password is : {{$one_time_password}} </p>
                 @endif
            </td>
           </div>
