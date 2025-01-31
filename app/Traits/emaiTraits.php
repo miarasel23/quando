@@ -182,4 +182,33 @@ trait emaiTraits {
         }
 
     }
+
+
+     public function sendEmailForReservationCancel($reservation, $subject) {
+        $mail = new PHPMailer(true);
+
+        try {
+            $mail->isSMTP();
+            $mail->Host = 'outbound.mailhop.org';
+            $mail->SMTPAuth = true;
+            $mail->Username =$this->emailUserName;
+            $mail->Password = $this->emailPassword;
+            $mail->SMTPSecure = 'tls'; // or 'STARTTLS'
+            $mail->Port = 587;
+            $mail->SMTPDebug = 0; // For debugging, remove in production
+
+            $mail->setFrom('reservations@tablebookings.co.uk', 'Table Bookings');
+            $mail->addAddress($reservation->restaurant->email, 'Recipient Name');
+            $mail->isHTML(true);
+            $mail->Subject = $subject;
+            $mail->Body = view('reservation.confirmation_email_cancel', compact('reservation'))->render();
+            $mail->send();
+
+
+        } catch (Exception $e) {
+            // Log the error instead of echoing it
+            \Log::error("Mail error: {$mail->ErrorInfo}");
+        }
+
+    }
 }
