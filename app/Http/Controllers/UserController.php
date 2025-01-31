@@ -182,6 +182,11 @@ class UserController extends Controller
                 ])->orWhere([
                     ['email', $request->email],
                     ])->first();
+
+
+            $phone_guest_active = GuestInformaion::where([
+                        ['phone', $request->phone],
+                        ])->first();
                 if(!empty($old_guest_active)){
 
                     if($old_guest_active->status == 'inactive' && $request->register_type=='register'){
@@ -189,7 +194,6 @@ class UserController extends Controller
                         $email_send_history = EmailSendValidation::where('email', $old_guest_active->email)->get();
                             if( $email_send_history->count() >= 0){
                             foreach ($email_send_history as $key => $value) {
-
 
 
                                 if(\Carbon\Carbon::parse($value->created_at)->format('Y-m-d') == $current_date){
@@ -220,17 +224,23 @@ class UserController extends Controller
                      }
 
 
-                     if($old_guest_active ->status == 'active' ){
+                     if(!empty($phone_guest_active)){
                         return response()->json([
                             'status' => true,
-                            'message' => 'This is already a registered user',
+                            'message' => 'This phone number already exists.',
+                            'data' => $old_guest_active
+                        ], 200);
+                     }elseif($old_guest_active ->status == 'active' ){
+                        return response()->json([
+                            'status' => true,
+                            'message' => 'This is already a registered user.',
                             'data' => $old_guest_active
                         ], 200);
 
                      }else{
                         return response()->json([
-                            'status' => false,
-                            'message' => 'This is already a registered user',
+                            'status' => true,
+                            'message' => 'This is already a registered user.',
                             'data' => $old_guest_active
                         ], 200);
                      }
