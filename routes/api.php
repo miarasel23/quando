@@ -38,6 +38,7 @@ Route::prefix('v1/user/')->group(function () {
     Route::post('verify-otp',[UserController::class,'verify_otp']);
     Route::post('password-update',[UserController::class,'password_update']);
     Route::post('contact-us',[UserController::class,'contact_us']);
+    Route::post('resend-email',[UserController::class,'resend_email']);
 
 
 

@@ -635,6 +635,62 @@ public function forget_password(Request $request){
                 ], 404);
             }
    }
+public function resend_email(Request $request){
+    $validateUser = Validator::make($request->all(), [
+        'email' => 'required|email',
+    ]);
+    if($validateUser->fails()){
+        return response()->json([
+            'status' => false,
+            'message' => 'validation error',
+            'errors' => $validateUser->errors()
+        ], 401);
+    }
+
+
+    $current_date = \Carbon\Carbon::now()->format('Y-m-d');
+    $count = 0;
+    $user = GuestInformaion::where('email', $request->email)->first();
+      // Generate OTP and store in cache
+
+          if (!empty($user) && $user->status != 'active') {
+            $email_send_history = EmailSendValidation::where('email', $user->email)->get();
+                if( $email_send_history->count() >= 0){
+                foreach ($email_send_history as $key => $value) {
+                    if(\Carbon\Carbon::parse($value->created_at)->format('Y-m-d') == $current_date){
+                        $count++;
+                    }
+                 }
+                    if($count < 2){
+                        $this->sendEmail($user,'Activate Your Account');
+                        EmailSendValidation::create([
+                            'email' => $user->email,
+                            'limit' => 1,
+                            'status'=>'success',
+                        ]);
+                    }else{
+                        EmailSendValidation::create([
+                            'email' => $user->email,
+                            'limit' => 1,
+                            'status'=>'failed',
+                        ]);
+                        return response()->json([
+                            'status' => true,
+                            'message' => 'Sorry! You have exceeded the limit'
+                        ], 200);
+                    }
+                }
+                return response()->json([
+                    'status' => true,
+                    'message' => 'OTP send on your email'
+                ], 200);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'User Not Found'
+                ], 404);
+            }
+   }
 
 
    public function verify_otp(Request $request){
