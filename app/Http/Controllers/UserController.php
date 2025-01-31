@@ -675,7 +675,7 @@ public function resend_email(Request $request){
                             'status'=>'failed',
                         ]);
                         return response()->json([
-                            'status' => true,
+                            'status' => false,
                             'message' => 'Sorry! You have exceeded the limit'
                         ], 200);
                     }
