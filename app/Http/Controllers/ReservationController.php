@@ -381,7 +381,7 @@ class ReservationController extends Controller
                 $data->noted = $request->note;
                 $data->updated_by = $request->user_uuid;
                 $data->save();
-                $reservationDetails = Reservation::where('uuid', $data->uuid)->with('guest_information', 'table_master', 'restaurant')->first();
+                $reservationDetails = Reservation::where('uuid', $request->uuid)->with('guest_information', 'table_master', 'restaurant')->first();
                 $this->sendEmailForReservationCancel($reservationDetails,'Reservation Cancelled');
                 return response()->json([
                     'status' => true,

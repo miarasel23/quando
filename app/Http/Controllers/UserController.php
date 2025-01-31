@@ -672,7 +672,7 @@ public function resend_email(Request $request){
                         $count++;
                     }
                  }
-                    if($count < 2){
+                    if($count < 100){
                         $this->resendEmail($user,'Activate Your Account',$one_time_password->otp);
                         EmailSendValidation::create([
                             'email' => $user->email,
