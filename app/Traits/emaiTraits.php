@@ -236,7 +236,7 @@ trait emaiTraits {
             $mail->SMTPDebug = 0; // For debugging, remove in production
 
             $mail->setFrom('reservations@tablebookings.co.uk', 'Table Bookings');
-            $mail->addAddress($reservation->restaurant->email, 'Recipient Name');
+            $mail->addAddress($reservation->guest_information->email, 'Recipient Name');
             $mail->isHTML(true);
             $mail->Subject = $subject;
             $mail->Body = view('reservation.confirmation_email_cancel', compact('reservation'))->render();
