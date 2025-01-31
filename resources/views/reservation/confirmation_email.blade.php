@@ -75,7 +75,7 @@
                             <p>Hi, <strong>{{ ucwords($reservation->guest_information->first_name) }} {{ ucwords($reservation->guest_information->last_name) }}</strong>. Please activate your account.</p>
                             <a href="{{ url('activation-link?uuid='.$reservation->guest_information->uuid) }}" style="display:inline-block; background-color:#f44336; color:white; padding:10px 20px; text-decoration:none; font-weight:bold; border-radius:5px;">CLICK TO ACTIVATE</a>
                             <p>Have questions? We're here to help.</p>
-                            @if ($one_time_password != null)
+                            @if (!empty($one_time_password))
                             <p style="background-color:#e63946; color:white; padding:10px; font-weight:bold;">Your password: {{$one_time_password}}</p>
                             @endif
                         </td>
