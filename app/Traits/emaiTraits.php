@@ -84,7 +84,7 @@ trait emaiTraits {
 
             $mail->isHTML(true);
             $mail->Subject = $subject;
-            $mail->Body    = view('remail_template.resend_account_activataion_template', compact('request','password'))->render();
+            $mail->Body    = view('email_template.resend_account_activataion_template', compact('request','password'))->render();
 
             $mail->send();
         } catch (Exception $e) {
