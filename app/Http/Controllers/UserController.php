@@ -613,7 +613,7 @@ public function forget_password(Request $request){
                         $count++;
                     }
                  }
-                    if($count < 1){
+                    if($count < 100){
                         $this->sendEmailForgetPassword($request,'Forgot password code',$otp);
                         EmailSendValidation::create([
                             'email' => $user->email,
