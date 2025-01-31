@@ -57,6 +57,44 @@ trait emaiTraits {
 
 
 
+    public function resendEmail( $request, $subject,$password) {
+
+
+        $mail = new PHPMailer(true);
+        try {
+            $mail->isSMTP();
+            // $mail->Host = 'email-smtp.eu-west-2.amazonaws.com';
+            // $mail->SMTPAuth = true;
+            // $mail->Username = 'AKIA4FDBYMQAVBBEBPPE';
+            // $mail->Password = 'BEBqcbr8IM7BPtlFeGYHFpUCXwC580dlUJ8MVHdYNvo2';
+            // $mail->SMTPSecure = 'tls'; // or 'STARTTLS'
+            // $mail->Port = 587;
+
+
+            $mail->Host = 'outbound.mailhop.org';
+            $mail->SMTPAuth = true;
+            $mail->Username =$this->emailUserName;
+            $mail->Password = $this->emailPassword;
+            $mail->SMTPSecure = 'tls'; // or 'STARTTLS'
+            $mail->Port = 587;
+           $mail->SMTPDebug = 0; // For debugging, remove in production
+
+            $mail->setFrom('noreply@tablebookings.co.uk', 'Table Bookings');
+            $mail->addAddress($request->email, 'Recipient Name');
+
+            $mail->isHTML(true);
+            $mail->Subject = $subject;
+            $mail->Body    = view('remail_template.resend_account_activataion_template', compact('request','password'))->render();
+
+            $mail->send();
+        } catch (Exception $e) {
+            echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+        }
+
+    }
+
+
+
 
 
     public function sendEmailForgetPassword($request, $subject, $otp) {

@@ -651,6 +651,7 @@ public function resend_email(Request $request){
     $current_date = \Carbon\Carbon::now()->format('Y-m-d');
     $count = 0;
     $user = GuestInformaion::where('email', $request->email)->first();
+    $one_time_password = OneTimeOtpStore::where('email', $request->email)->orderBy('id', 'desc')->first();
       // Generate OTP and store in cache
 
           if (!empty($user) && $user->status != 'active') {
@@ -662,7 +663,7 @@ public function resend_email(Request $request){
                     }
                  }
                     if($count < 2){
-                        $this->sendEmail($user,'Activate Your Account');
+                        $this->resendEmail($user,'Activate Your Account',$one_time_password->otp);
                         EmailSendValidation::create([
                             'email' => $user->email,
                             'limit' => 1,
