@@ -122,6 +122,8 @@ trait emaiTraits {
             $mail->send();
 
 
+            
+
         } catch (Exception $e) {
             // Log the error instead of echoing it
             \Log::error("Mail error: {$mail->ErrorInfo}");

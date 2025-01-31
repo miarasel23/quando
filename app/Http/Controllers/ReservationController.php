@@ -183,7 +183,7 @@ class ReservationController extends Controller
                                 'status'=>'success',
                             ]);
 
-                            $this->sendEmailForReservationOwner($reservationDetails,'Reservation Confirmation',$one_time_password);
+                            $this->sendEmailForReservationOwner($reservationDetails,'Reservation Confirmation');
                             EmailSendValidation::create([
                                 'email' => $reservationDetails->restaurant->email,
                                 'limit' => 1,
