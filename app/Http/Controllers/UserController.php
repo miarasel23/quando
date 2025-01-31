@@ -696,7 +696,7 @@ public function resend_email(Request $request){
                 }
                 return response()->json([
                     'status' => true,
-                    'message' => 'OTP send on your email'
+                    'message' => 'Activation link and one time password send on your email'
                 ], 200);
             } else {
                 return response()->json([

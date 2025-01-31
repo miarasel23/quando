@@ -169,7 +169,6 @@ class ReservationController extends Controller
                 'day' => $request->day,
 
             ]);
-
             $reservationDetails = Reservation::where('uuid', $request->reservation_uuid)->with('guest_information', 'table_master', 'restaurant')->first();
             if(isset($reservationDetails) && !empty($reservationDetails)){
 
