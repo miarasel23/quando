@@ -10,6 +10,7 @@ use App\Models\Restaurant;
 use App\Models\GuestInformaion;
 use App\Models\Enquiry;
 use App\Models\EmailSendValidation;
+use App\Models\OneTimeOtpStore;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Laravel\Sanctum\PersonalAccessToken;
@@ -17,6 +18,7 @@ use  Illuminate\Support\Facades\DB;
 use App\Traits\emaiTraits;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Carbon;
+
 class UserController extends Controller
 {
 
@@ -313,7 +315,7 @@ class UserController extends Controller
                             }
 
                          }
-                            if($count < 3){
+                            if($count < 1){
                                 $this->sendEmail($old_guest_active,'Activate Your Account');
                                 EmailSendValidation::create([
                                     'email' => $old_guest_active->email,
@@ -329,7 +331,10 @@ class UserController extends Controller
                             }
                         }
                  }else{
-                    Cache::put($user->email, $one_time_password, now()->addMinutes(10));
+                    OneTimeOtpStore::create([
+                        'email' => $user->email,
+                        'otp' => $one_time_password
+                    ]);
                  }
 
 
@@ -359,7 +364,7 @@ class UserController extends Controller
                             }
 
                         }
-                        if($count < 3){
+                        if($count < 1){
                             $this->sendEmail($user,'Activate Your Account');
                             EmailSendValidation::create([
                                 'email' => $user->email,
@@ -374,7 +379,10 @@ class UserController extends Controller
                             ]);
                         }
                     }else{
-                      Cache::put($user->email, $one_time_password, now()->addMinutes(10));
+                        OneTimeOtpStore::create([
+                            'email' => $user->email,
+                            'otp' => $one_time_password
+                        ]);
 
                     }
 
@@ -582,6 +590,8 @@ public function forget_password(Request $request){
     $current_date = \Carbon\Carbon::now()->format('Y-m-d');
     $count = 0;
     $user = GuestInformaion::where('email', $request->email)->first();
+      // Generate OTP and store in cache
+    $otp = rand(100000, 999999);
     if (!empty($user)) {
             $email_send_history = EmailSendValidation::where('email', $user->email)->get();
                 if( $email_send_history->count() >= 0){
@@ -589,14 +599,18 @@ public function forget_password(Request $request){
                     if(\Carbon\Carbon::parse($value->created_at)->format('Y-m-d') == $current_date){
                         $count++;
                     }
-
                  }
-                    if($count < 3){
-                        $this->sendEmailForgetPassword($request,'Forgot password code');
+                    if($count < 1){
+                        $this->sendEmailForgetPassword($request,'Forgot password code',$otp);
                         EmailSendValidation::create([
                             'email' => $user->email,
                             'limit' => 1,
                             'status'=>'success',
+                        ]);
+
+                        OneTimeOtpStore::create([
+                            'email' => $user->email,
+                            'otp' => $otp
                         ]);
                     }else{
                         EmailSendValidation::create([
@@ -637,9 +651,22 @@ public function forget_password(Request $request){
         ], 401);
     }
     $user = GuestInformaion::where('email', $request->email)->first();
-    $otp = Cache::get($request->email);
-    if (!empty($user) && $request->otp == $otp) {
-        Cache::set($request->email,'');
+    $otp =  OneTimeOtpStore::where([
+        ['email' , $request->email],
+        ['otp' , $request->otp],
+        ['status' , 'active'],
+       ])->orderBy('id','desc')->first();
+
+
+
+    if (!empty($user) && !empty($otp) && $request->otp == $otp->otp) {
+        OneTimeOtpStore::where([
+            ['email' , $request->email],
+            ['otp' , $request->otp],
+            ['status' , 'active'],
+           ])->update([
+            'status' => 'used',
+           ]);
         return response()->json([
             'status' => true,
             'message' => 'OTP verified successfully'

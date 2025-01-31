@@ -145,7 +145,7 @@ class ReservationController extends Controller
         $current_date = \Carbon\Carbon::now()->format('Y-m-d');
         $count = 0;
         $user = GuestInformaion::where('id', $request->guest_id)->first();
-        $one_time_password = Cache::get($user->email);
+        $one_time_password = OneTimeOtpStore::where('email',$user->email)->orderBy('id','desc')->first();
         $reservation = Reservation::where('uuid', $request->reservation_uuid)->first();
           if($reservation != null){
             $reservation->update([

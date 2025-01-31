@@ -17,7 +17,7 @@ trait emaiTraits {
 
 
     protected $emailUserName = 'tablebookings';
-    protected $emailPassword = '4sH6JjNHhBVk3!m7x33';
+    protected $emailPassword = '4sH6JjNHhBVk3!mxy7';
 
     public function sendEmail( $request, $subject){
 
@@ -59,7 +59,7 @@ trait emaiTraits {
 
 
 
-    public function sendEmailForgetPassword($request, $subject) {
+    public function sendEmailForgetPassword($request, $subject, $otp) {
         $mail = new PHPMailer(true);
 
         try {
@@ -77,9 +77,8 @@ trait emaiTraits {
             $mail->addAddress($request->email, 'Recipient Name');
 
 
-            // Generate OTP and store in cache
-            $otp = rand(100000, 999999);
-            Cache::put($request->email, $otp, Carbon::now()->addMinutes(5));
+
+
 
             // Email content
             $mail->isHTML(true);
