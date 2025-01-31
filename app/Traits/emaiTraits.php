@@ -17,7 +17,7 @@ trait emaiTraits {
 
 
     protected $emailUserName = 'tablebookings';
-    protected $emailPassword = '4sH6JjNHhBVk3!mxy7';
+    protected $emailPassword = '4sH6JjNHhBVk3!m';
 
     public function sendEmail( $request, $subject){
 
