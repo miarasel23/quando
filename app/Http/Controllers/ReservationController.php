@@ -177,7 +177,7 @@ class ReservationController extends Controller
 
                      }
                         if($count < 5){
-                            $this->sendEmailForReservation($reservationDetails,'Reservation Confirmation',$one_time_password);
+                            $this->sendEmailForReservation($reservationDetails,'Reservation Confirmation',$one_time_password->otp);
                             EmailSendValidation::create([
                                 'email' => $user->email,
                                 'limit' => 1,
