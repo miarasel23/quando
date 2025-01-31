@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\Rule;
 use Laravel\Sanctum\PersonalAccessToken;
 use  Illuminate\Support\Facades\DB;
+use App\Models\OneTimeOtpStore;
 use App\Traits\emaiTraits;
 
 class ReservationController extends Controller
