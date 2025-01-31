@@ -147,6 +147,14 @@ class ReservationController extends Controller
         $count = 0;
         $user = GuestInformaion::where('id', $request->guest_id)->first();
         $one_time_password = OneTimeOtpStore::where('email',$user->email)->orderBy('id','desc')->first();
+
+        if(!empty($one_time_password)){
+            $one_time_passs = $one_time_password->otp;
+        }else{
+            $one_time_passs = "";
+        }
+
+
         $reservation = Reservation::where('uuid', $request->reservation_uuid)->first();
           if($reservation != null){
             $reservation->update([
@@ -177,7 +185,7 @@ class ReservationController extends Controller
 
                      }
                         if($count < 5){
-                            $this->sendEmailForReservation($reservationDetails,'Reservation Confirmation',$one_time_password->otp);
+                            $this->sendEmailForReservation($reservationDetails,'Reservation Confirmation',$one_time_passs);
                             EmailSendValidation::create([
                                 'email' => $user->email,
                                 'limit' => 1,

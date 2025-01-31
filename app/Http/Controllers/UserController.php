@@ -221,6 +221,9 @@ class UserController extends Controller
                                     ], 200);
                                 }
                             }
+                     }else{
+
+
                      }
 
 
@@ -239,7 +242,7 @@ class UserController extends Controller
 
                      }else{
                         return response()->json([
-                            'status' => true,
+                            'status' => false,
                             'message' => 'This is already a registered user.',
                             'data' => $old_guest_active
                         ], 200);
