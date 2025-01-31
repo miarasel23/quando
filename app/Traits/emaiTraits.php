@@ -122,7 +122,7 @@ trait emaiTraits {
             $mail->send();
 
 
-            
+
 
         } catch (Exception $e) {
             // Log the error instead of echoing it
