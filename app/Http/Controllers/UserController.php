@@ -229,7 +229,7 @@ class UserController extends Controller
 
                      if(!empty($phone_guest_active)){
                         return response()->json([
-                            'status' => true,
+                            'status' => false,
                             'message' => 'This phone number already exists.',
                             'data' => $old_guest_active
                         ], 200);
