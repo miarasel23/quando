@@ -14,6 +14,7 @@ class Reservation extends Model
 
     protected $fillable = [
 
+        'uuid',
         'guest_information_id',
         'table_master_id',
         'restaurant_id',
