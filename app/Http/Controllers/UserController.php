@@ -223,7 +223,7 @@ class UserController extends Controller
                      if(!empty($old_guest_active) &&  $request->phone == $old_guest_active->phone ||  !empty($old_guest_active) &&  $request->email == $old_guest_active->email ){
                         return response()->json([
                             'status' => false,
-                            'message' =>  $request->phone == $phone_guest_active->phone  ? 'This phone number already exists.': 'This email already exists.',
+                            'message' =>  $request->phone == $old_guest_active->phone  ? 'This phone number already exists.': 'This email already exists.',
                             'data' => $old_guest_active
                         ], 200);
                      }elseif($old_guest_active ->status == 'active' ){
