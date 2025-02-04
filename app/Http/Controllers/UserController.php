@@ -184,9 +184,6 @@ class UserController extends Controller
                     ])->first();
 
 
-            $phone_guest_active = GuestInformaion::where([
-                        ['phone', $request->phone],
-                        ])->first();
                 if(!empty($old_guest_active)){
 
                     if($old_guest_active->status == 'inactive' && $request->register_type=='register'){
@@ -221,29 +218,25 @@ class UserController extends Controller
                                     ], 200);
                                 }
                             }
-                     }else{
-
-
                      }
 
-
-                     if(!empty($phone_guest_active)){
+                     if(!empty($old_guest_active) &&  $request->phone == $old_guest_active->phone ||  !empty($old_guest_active) &&  $request->email == $old_guest_active->email ){
                         return response()->json([
-                            'status' => true,
-                            'message' => 'This phone number already exists.',
+                            'status' => false,
+                            'message' =>  $request->phone == $phone_guest_active->phone  ? 'This phone number already exists.': 'This email already exists.',
                             'data' => $old_guest_active
                         ], 200);
                      }elseif($old_guest_active ->status == 'active' ){
                         return response()->json([
-                            'status' => true,
+                            'status' => false,
                             'message' => 'This is already a registered user.',
                             'data' => $old_guest_active
                         ], 200);
 
                      }else{
                         return response()->json([
-                            'status' => false,
-                            'message' => 'This is already a registered user.',
+                            'status' => true,
+                            'message' => 'User create successful!.',
                             'data' => $old_guest_active
                         ], 200);
                      }
