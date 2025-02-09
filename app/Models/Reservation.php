@@ -27,6 +27,7 @@ class Reservation extends Model
         'check_in_time',
         'check_out_time',
         'day',
+        'noted',
         'updated_by',
     ];
 
