@@ -85,6 +85,7 @@ class UserController extends Controller
                     'user_type' => $request->user_type,
                     'phone' => $request->phone,
                     'email' => $request->email,
+                    'status' => $request->status,
                     'password' => Hash::make($request->password),
                 ]);
                 return response()->json([
@@ -104,6 +105,7 @@ class UserController extends Controller
                 'user_type' => $request->user_type,
                 'phone' => $request->phone,
                 'email' => $request->email,
+                'status' => $request->status,
                 'password' => $request->password !="" ? Hash::make($request->password) : $user->password,
             ]);
             return response()->json([
