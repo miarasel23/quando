@@ -44,6 +44,10 @@
                                     <th style="padding:8px;">Guests:</th>
                                     <td>{{ $reservation->number_of_people }}</td>
                                 </tr>
+                                <tr>
+                                    <th style="padding:8px;">Notes:</th>
+                                    <td>{{ $reservation->noted }}</td>
+                                </tr>
                             </table>
                         </td>
                     </tr>

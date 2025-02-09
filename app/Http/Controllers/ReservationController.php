@@ -133,6 +133,7 @@ class ReservationController extends Controller
             'date' => 'required',
             'day'=>'required',
             'number_of_people' => 'required',
+            'noted' => 'nullable',
             'status'=>'required'
         ]);
         if ($validateUser->fails()) {
@@ -166,6 +167,7 @@ class ReservationController extends Controller
                 'end' => $request->end_time,
                 'reservation_date' => $request->date,
                 'number_of_people' => $request->number_of_people,
+                'noted' => $request->noted,
                 'day' => $request->day,
 
             ]);
