@@ -61,7 +61,7 @@ class UserController extends Controller
                     'unique:users',
                     'regex:/^(\+?\d{1,3}[-.\s]?)?\d{10}$/' ,
                 ]),
-                'password' =>  in_array($request->params, [ 'info']) ? 'nullable' : (  in_array($request->params, [ 'update']) ? 'required' : 'nullable'),
+                'password' =>  in_array($request->params, [ 'info']) ? 'nullable' : (  in_array($request->params, [ 'update']) ? 'nullable' : 'nullable'),
             ]);
             if ($validateUser->fails()) {
                 return response()->json([
