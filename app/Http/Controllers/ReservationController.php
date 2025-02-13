@@ -400,7 +400,7 @@ class ReservationController extends Controller
                 ], 200);
             }elseif(in_array($request->params, ['accept']) && $data != null && $data->status == 'reject'){
                     if ($data != null &&  $data->status == 'pending') {
-                        $data->status = $request->status == 'accept' ? 'confirmed' : 'reject';
+                        $data->status = $request->params == 'accept' ? 'confirmed' : 'reject';
                         $data->noted = $request->note;
                         $data->updated_by = $request->user_uuid;
                         $data->save();
