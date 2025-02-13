@@ -298,7 +298,7 @@ class AdminController extends Controller
 
     public function restaurant_list(Request $request){
         $perPage = $request->input('per_page', 10);
-        $restaurant = Restaurant::orderBy('id', 'desc')->with('category_list','aval_slots','label_tags','about_label_tags','photos','reviews',)->where('status', 'active')->select(['id','uuid','restaurant_id','name','address','phone','email','category','description','post_code','status','avatar','website','online_order'])->paginate($perPage);
+        $restaurant = Restaurant::orderBy('id', 'desc')->with('category_list','aval_slots','label_tags','about_label_tags','photos','reviews',)->where('status', 'active')->select(['id','uuid','restaurant_id','name','address','phone','email','category','description','post_code','status','avatar','website','online_order','reservation_status'])->paginate($perPage);
         if ($restaurant->count() == 0) {
             return response()->json([
                 'status' => false,
