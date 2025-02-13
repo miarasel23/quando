@@ -385,7 +385,7 @@ class ReservationController extends Controller
                 ], 404);
             }
         }elseif(in_array($request->params, ['cancel'])){
-            if ($data != null && $data->status == 'checkin' || $data->status == 'pending') {
+            if ($data != null && $data->status == 'confirmed' || $data->status == 'pending') {
 
                 $data->status = 'cancelled';
                 $data->noted = $request->note;
