@@ -402,19 +402,21 @@ class ReservationController extends Controller
         }elseif (in_array($request->params, ['accept', 'reject']))
             {
 
-                    if ($data != null &&  $data->status == 'pending') {
-                        $data->status = $request->params == 'accept' ? 'confirmed' : 'reject';
-                        $data->noted = $request->note;
-                        $data->updated_by = $request->user_uuid;
-                        $data->save();
-                        $reservationDetails = Reservation::where('uuid', $request->uuid)->with('guest_information', 'table_master', 'restaurant')->first();
-                        $this->sendEmailForReservationCancel($reservationDetails, $request->status == 'accept' ? 'Reservation Accepted' : 'Reservation Rejected');
-                        return response()->json([
-                            'status' => true,
-                            'message' => 'Reservation Cancelled Successfully',
-                            'data' => $data
-                        ], 200);
-                    }
+                if ($data != null && $data->status == 'pending') {
+                $data->status = $request->params == 'accept' ? 'confirmed' : 'reject';
+                $data->noted = $request->note;
+                $data->updated_by = $request->user_uuid;
+                $data->save();
+                $reservationDetails = Reservation::where('uuid', $request->uuid)->with('guest_information',
+                'table_master', 'restaurant')->first();
+                $this->sendEmailForReservationCancel($reservationDetails, $request->status == 'accept' ? 'Reservation
+                Accepted' : 'Reservation Rejected');
+                return response()->json([
+                'status' => true,
+                'message' => 'Reservation Cancelled Successfully',
+                'data' => $data
+                ], 200);
+                }
             }
         else {
         return response()->json([
