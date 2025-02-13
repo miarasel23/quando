@@ -29,6 +29,7 @@ class Restaurant extends Model
         'website',
         'updated_by',
         'online_order',
+        'reservation_status',
         'status',
     ];
 

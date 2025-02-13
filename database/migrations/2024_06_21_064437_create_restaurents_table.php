@@ -26,6 +26,7 @@ return new class extends Migration
             $table->string('created_by');
             $table->string('updated_by')->nullable();
             $table->string('website')->nullable();
+            $table->enum('reservation_status',['automatic', 'manual']);
             $table->enum('online_order',['active', 'inactive'])->default('active');
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->timestamps();

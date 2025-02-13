@@ -157,9 +157,10 @@ class ReservationController extends Controller
 
 
         $reservation = Reservation::where('uuid', $request->reservation_uuid)->first();
+        $restaurant = Restaurant::where('uuid', $request->rest_uuid)->first();
           if($reservation != null){
             $reservation->update([
-                'status' => 'pending',
+                'status' => $restaurant->reservation_status == 'automatic' ? 'confirmed' :'pending',
                 'guest_information_id' => $request->guest_id,
                 'reservation_time' => $request->start_time,
                 'table_master_id' => $reservation->table_master_id,
@@ -186,14 +187,14 @@ class ReservationController extends Controller
 
                      }
                         if($count < 5){
-                            $this->sendEmailForReservation($reservationDetails,'Reservation Confirmation',$one_time_passs);
+                            $this->sendEmailForReservation($reservationDetails,    $reservationDetails->status == 'confirmed' ? 'Reservation Confirmation' : 'Reservation pending',$one_time_passs);
                             EmailSendValidation::create([
                                 'email' => $user->email,
                                 'limit' => 1,
                                 'status'=>'success',
                             ]);
 
-                            $this->sendEmailForReservationOwner($reservationDetails,'Reservation Confirmation');
+                            $this->sendEmailForReservationOwner($reservationDetails, $reservationDetails->status == 'confirmed' ? 'Reservation Confirmation' : 'Reservation pending',);
                             EmailSendValidation::create([
                                 'email' => $reservationDetails->restaurant->email,
                                 'limit' => 1,
