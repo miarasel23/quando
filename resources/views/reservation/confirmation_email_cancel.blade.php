@@ -28,10 +28,10 @@
                             <h1 style="color:#333;">{{ $reservation->restaurant->name }}</h1>
                             <h2 style="color:
                             {{ $reservation->status == 'confirmed' ? '#4CAF50' :
-                               ($reservation->status == 'rejected' ? '#f44336' :
+                               ($reservation->status == 'reject' ? '#f44336' :
                                ($reservation->status == 'cancelled' ? '#FF9800' : '#000')) }}">
                             {{ $reservation->status == 'confirmed' ? 'Reservation has been confirmed' :
-                               ($reservation->status == 'rejected' ? 'Reservation has been rejected' :
+                               ($reservation->status == 'reject' ? 'Reservation has been rejected' :
                                ($reservation->status == 'cancelled' ? 'Reservation has been cancelled' : 'Something went wrong!!')) }}
                            </h2>
 
