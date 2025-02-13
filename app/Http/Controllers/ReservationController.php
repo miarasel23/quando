@@ -411,6 +411,12 @@ class ReservationController extends Controller
                             'message' => 'Reservation Cancelled Successfully',
                             'data' => $data
                         ], 200);
+                    }else{
+                        return response()->json([
+                            'status' => false,
+                            'message' => 'Something went wrong',
+                            'data' => $data
+                        ], 200);
                     }
             }
              else {
