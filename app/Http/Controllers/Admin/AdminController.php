@@ -209,21 +209,21 @@ class AdminController extends Controller
            $floarData = FloorArea::where('restaurant_id', $restaurant->id)->where('status', 'active')->get();
            if(count($floarData) == 0){
             return response()->json([
-                'status' => true,
+                'status' => false,
                 'message' => 'Restaurant can not be active as it has no floor area',
             ]);
            }
            $tableData = TableMaster::where('restaurant_id', $restaurant->id)->where('status', 'active')->get();
            if(count($tableData) == 0){
             return response()->json([
-                'status' => true,
+                'status' => false,
                 'message' => 'Restaurant can not be active as it has no table',
             ]);
            }
            $slotsData = Slot::where('restaurant_id', $restaurant->id)->where('status', 'active')->get();
            if(count($slotsData) == 0){
             return response()->json([
-                'status' => true,
+                'status' => false,
                 'message' => 'Restaurant can not be active as it has no slots',
             ]);
            }
