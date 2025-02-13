@@ -21,7 +21,15 @@
                     <tr>
                         <td align="center" style="padding:20px;">
                             <h1 style="color:#333;">{{ $reservation->restaurant->name }}</h1>
-                            <h2 style="color:#f44336;">Reservation cancelled</h2>
+                            <h2 style="color:
+                            {{ $reservation->status == 'confirmed' ? '#4CAF50' :
+                               ($reservation->status == 'rejected' ? '#f44336' :
+                               ($reservation->status == 'cancelled' ? '#FF9800' : '#000')) }}">
+                            {{ $reservation->status == 'confirmed' ? 'Reservation has been confirmed' :
+                               ($reservation->status == 'rejected' ? 'Reservation has been rejected' :
+                               ($reservation->status == 'cancelled' ? 'Reservation has been cancelled' : 'Something went wrong!!')) }}
+                           </h2>
+
                             <h4>Reservation ID: {{ $reservation->reservation_id }}</h4>
                             <p>Dear <strong>{{ ucwords($reservation->guest_information->first_name) }} {{ ucwords($reservation->guest_information->last_name) }}</strong>,</p>
                             <p>If you need to make any changes, please call <strong>{{ $reservation->restaurant->phone }}</strong>.</p>

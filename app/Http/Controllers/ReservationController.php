@@ -307,7 +307,7 @@ class ReservationController extends Controller
     }
 
     public function reservation_for_restaurant(Request $request){
-        if (in_array($request->params, ['cancel', 'checkin', 'checkout'])) {
+        if (in_array($request->params, ['cancel', 'checkin', 'checkout','reject','accept'])) {
             $data = Reservation::where('uuid', $request->uuid)->first();
         }
         $validateUser = Validator::make($request->all(), [
@@ -398,7 +398,22 @@ class ReservationController extends Controller
                     'message' => 'Reservation Cancelled Successfully',
                     'data' => $data
                 ], 200);
-            } else {
+            }elseif(in_array($request->params, ['accept']) && $data != null && $data->status == 'reject'){
+                    if ($data != null &&  $data->status == 'pending') {
+                        $data->status = $request->status == 'accept' ? 'confirmed' : 'reject';
+                        $data->noted = $request->note;
+                        $data->updated_by = $request->user_uuid;
+                        $data->save();
+                        $reservationDetails = Reservation::where('uuid', $request->uuid)->with('guest_information', 'table_master', 'restaurant')->first();
+                        $this->sendEmailForReservationCancel($reservationDetails, $request->status == 'accept' ? 'Reservation Accepted' : 'Reservation Rejected');
+                        return response()->json([
+                            'status' => true,
+                            'message' => 'Reservation Cancelled Successfully',
+                            'data' => $data
+                        ], 200);
+                    }
+            }
+             else {
                 return response()->json([
                     'status' => false,
                     'message' => 'Reservation Not Found',
