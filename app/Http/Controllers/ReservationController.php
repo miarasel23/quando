@@ -398,7 +398,8 @@ class ReservationController extends Controller
                     'message' => 'Reservation Cancelled Successfully',
                     'data' => $data
                 ], 200);
-            }elseif (in_array($request->params, ['accept', 'reject']))
+            }
+        }elseif (in_array($request->params, ['accept', 'reject']))
             {
 
                     if ($data != null &&  $data->status == 'pending') {
@@ -415,12 +416,11 @@ class ReservationController extends Controller
                         ], 200);
                     }
             }
-             else {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Reservation Not Found',
-                ], 404);
-            }
+        else {
+        return response()->json([
+        'status' => false,
+        'message' => 'Reservation Not Found',
+        ], 404);
         }
     }
 
