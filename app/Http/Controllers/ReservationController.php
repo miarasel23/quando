@@ -398,7 +398,9 @@ class ReservationController extends Controller
                     'message' => 'Reservation Cancelled Successfully',
                     'data' => $data
                 ], 200);
-            }elseif(in_array($request->params == 'accept') || $request->params == 'reject'){
+            }elseif (in_array($request->params, ['accept', 'reject']))
+            {
+
                     if ($data != null &&  $data->status == 'pending') {
                         $data->status = $request->params == 'accept' ? 'confirmed' : 'reject';
                         $data->noted = $request->note;
@@ -409,12 +411,6 @@ class ReservationController extends Controller
                         return response()->json([
                             'status' => true,
                             'message' => 'Reservation Cancelled Successfully',
-                            'data' => $data
-                        ], 200);
-                    }else{
-                        return response()->json([
-                            'status' => false,
-                            'message' => 'Something went wrong',
                             'data' => $data
                         ], 200);
                     }
