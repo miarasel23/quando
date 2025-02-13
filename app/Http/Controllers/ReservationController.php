@@ -351,7 +351,7 @@ class ReservationController extends Controller
                 }
             }
         } elseif (in_array($request->params, ["checkin"])) {
-            if ($data != null && $data->status == 'pending') {
+            if ($data != null && $data->status == 'pending' || $data->status == 'confirmed') {
                 $data->check_in_time = $request->checkin_time;
                 $data->status = 'check_in';
                 $data->noted = $request->note;
