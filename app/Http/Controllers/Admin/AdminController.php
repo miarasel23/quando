@@ -162,6 +162,7 @@ class AdminController extends Controller
                 'created_by' => $request['created_by'],
                 'website' => $request['website'],
                 'status' => "inactive",
+                'reservation_status' => $request['reservation_status'],
             ]);
             return response()->json([
                 'status' => true,
@@ -196,6 +197,7 @@ class AdminController extends Controller
         $restaurant->post_code = $request->post_code;
         $restaurant->website = $request->website;
         $restaurant->updated_by = $request->updated_by;
+        $restaurant->reservation_status = $request->reservation_status;
         if($request->status == "inactive"){
             $restaurant->status = $request->status;
         }

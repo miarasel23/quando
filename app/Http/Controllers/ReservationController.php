@@ -186,7 +186,7 @@ class ReservationController extends Controller
                         }
 
                      }
-                        if($count < 5){
+                        if($count < 20){
                             $this->sendEmailForReservation($reservationDetails,    $reservationDetails->status == 'confirmed' ? 'Reservation Confirmation' : 'Reservation pending',$one_time_passs);
                             EmailSendValidation::create([
                                 'email' => $user->email,
