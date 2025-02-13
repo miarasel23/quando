@@ -315,7 +315,7 @@ class ReservationController extends Controller
             'checkin_time' => in_array($request->params, ['checkin']) ? 'required' : 'nullable',
             'checkout_time' => in_array($request->params, ['checkout']) ? 'required' : 'nullable',
             'uuid' => in_array($request->params, ['checkin', 'checkout', 'cancel']) ? 'required|exists:reservations,uuid' : 'nullable',
-            'user_uuid' => in_array($request->params, [ 'cancel']) ? 'required' : 'nullable',
+            'user_uuid' => in_array($request->params, [ 'cancel','reject','accept']) ? 'required' : 'nullable',
             'params' => 'required|string'
         ]);
         if ($validateUser->fails()) {
@@ -398,7 +398,7 @@ class ReservationController extends Controller
                     'message' => 'Reservation Cancelled Successfully',
                     'data' => $data
                 ], 200);
-            }elseif(in_array($request->params, ['accept']) && $data != null && $data->status == 'reject'){
+            }elseif(in_array($request->params, ['accept']) && $request->params == 'reject'){
                     if ($data != null &&  $data->status == 'pending') {
                         $data->status = $request->params == 'accept' ? 'confirmed' : 'reject';
                         $data->noted = $request->note;
