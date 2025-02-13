@@ -135,6 +135,9 @@ class AdminController extends Controller
             'avatar' =>  in_array($request->params, ['info']) ? '' :'image|mimes:jpeg,png,jpg,svg|max:2048',
             'uuid' => in_array($request->store_type, ['update', 'info']) ? 'required' : 'nullable',
             'status' =>  in_array($request->params, ['info']) ?'nullable':'required',
+            'reservation_status' => in_array($request->params, ['info'])
+            ? 'nullable|in:automatic,manual'
+            : 'required|in:automatic,manual',
         ]);
         if ($validateUser->fails()) {
             return response()->json([
