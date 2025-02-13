@@ -22,7 +22,7 @@
                         <td align="center" style="padding:20px;">
                             <h1 style="color:#333;">{{ $reservation->restaurant->name }}</h1>
                             <h2 style="color:#f44336;">
-                                {{ $reservation->status == 'confirmed' ? 'Reservation has been confirmed' : 'Your reservation is pending, please accept or reject' }}
+                                {{ $reservation->status == 'confirmed' ? 'Reservation has been confirmed' : 'Your reservation is pending, Please accept ' }}
                             </h2>
                             <h4>Reservation ID: {{ $reservation->reservation_id }}</h4>
                             <p>Dear <strong>{{ ucwords($reservation->guest_information->first_name) }} {{ ucwords($reservation->guest_information->last_name) }}</strong>,</p>
