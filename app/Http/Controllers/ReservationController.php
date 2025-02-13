@@ -409,7 +409,7 @@ class ReservationController extends Controller
                 $data->save();
                 $reservationDetails = Reservation::where('uuid', $request->uuid)->with('guest_information',
                 'table_master', 'restaurant')->first();
-                $this->sendEmailForReservationCancel($reservationDetails, $request->status == 'accept' ? 'Reservation
+                $this->sendEmailForReservationCancel($reservationDetails, $request->params == 'accept' ? 'Reservation
                 Accepted' : 'Reservation Rejected');
                 return response()->json([
                 'status' => true,
