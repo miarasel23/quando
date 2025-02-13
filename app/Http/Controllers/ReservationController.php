@@ -314,7 +314,7 @@ class ReservationController extends Controller
             'rest_uuid' => in_array($request->params, ['info']) ? 'required|exists:restaurants,uuid' : 'required',
             'checkin_time' => in_array($request->params, ['checkin']) ? 'required' : 'nullable',
             'checkout_time' => in_array($request->params, ['checkout']) ? 'required' : 'nullable',
-            'uuid' => in_array($request->params, ['checkin', 'checkout', 'cancel']) ? 'required|exists:reservations,uuid' : 'nullable',
+            'uuid' => in_array($request->params, ['checkin', 'checkout', 'cancel','reject','accept']) ? 'required|exists:reservations,uuid' : 'nullable',
             'user_uuid' => in_array($request->params, [ 'cancel','reject','accept']) ? 'required' : 'nullable',
             'params' => 'required|string'
         ]);
