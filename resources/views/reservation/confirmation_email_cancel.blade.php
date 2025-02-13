@@ -3,7 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your reservation has been cancelled</title>
+    <title>{{ $reservation->status == 'confirmed' ? '#4CAF50' :
+        ($reservation->status == 'rejected' ? '#f44336' :
+        ($reservation->status == 'cancelled' ? '#FF9800' : '#000')) }}">
+     {{ $reservation->status == 'confirmed' ? 'Reservation has been confirmed' :
+        ($reservation->status == 'rejected' ? 'Reservation has been rejected' :
+        ($reservation->status == 'cancelled' ? 'Reservation has been cancelled' : 'Something went wrong!!')) }}</title>
 </head>
 <body style="margin:0; padding:0; background-color:#f4f4f4; font-family: Arial, sans-serif;">
     <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f4f4f4; padding: 20px;">

@@ -413,7 +413,7 @@ class ReservationController extends Controller
                 Accepted' : 'Reservation Rejected');
                 return response()->json([
                 'status' => true,
-                'message' => 'Reservation Cancelled Successfully',
+                'message' => 'Reservation update Successfully',
                 'data' => $data
                 ], 200);
                 }
