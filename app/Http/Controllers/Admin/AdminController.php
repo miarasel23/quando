@@ -393,36 +393,21 @@ class AdminController extends Controller
             'data' => $restaurant
         ], 200);
     }
-
     public function restaurant_search_list(Request $request){
-        $perPage = $request->input('per_page', 10);
+        $perPage = $request->input('per_page', 100000);
         $name = trim($request->input('name', ''));
         $postCode = trim($request->input('post_code', ''));
-
-        // Start Query
-        $query = Restaurant::orderBy('id', 'desc')
-        ->with('category_list', 'aval_slots', 'label_tags', 'about_label_tags', 'photos', 'reviews')
-        ->where('status', 'active')
-        ->select([
-        'id', 'uuid', 'restaurant_id', 'name', 'address', 'phone',
-        'email', 'category', 'description', 'post_code', 'status',
-        'avatar', 'website', 'online_order'
-        ]);
-
-        // Apply Filters
+        $query = Restaurant::orderBy('id',
+        'desc')->with('category_list','aval_slots','label_tags','about_label_tags','photos','reviews',)->where('status',
+        'active')->select(['id','uuid','restaurant_id','name','address','phone','email','category','description','post_code','status','avatar','website','online_order']);
         if (!empty($name)) {
-        $query->where('name', 'LIKE', "%{$name}%");
+            $query->where('name', 'LIKE', "%{$name}%");
         }
         if (!empty($postCode)) {
-        $query->where('post_code', 'LIKE', "%{$postCode}%");
+            $query->where('post_code', 'LIKE', "%{$postCode}%");
         }
-    // Debugging (Optional)
-    // dd($query->toSql(), $query->getBindings());
-
-    // Fetch Data
         $restaurants = $query->paginate($perPage);
-    // Check if results exist
-    if ($restaurants->isEmpty()) {
+        if ($restaurants->count() == 0) {
             return response()->json([
                 'status' => false,
                 'message' => 'Restaurant not found'
@@ -433,6 +418,8 @@ class AdminController extends Controller
             'data' => $restaurants
         ], 200);
     }
+
+
 
     public function restaurant_single_info(Request $request,$uuid){
         $restaurant = Restaurant::where('uuid', $uuid)
