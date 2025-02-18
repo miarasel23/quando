@@ -402,7 +402,7 @@ class AdminController extends Controller
             $query->where('name', 'like', '%' . $name . '%');
         }
         if ($postCode) {
-            $query->where('post_code', 'like', '%' . $postCode . '%');
+            $query->where('post_code', 'like', '%' . $name . '%');
         }
         $restaurants = $query->paginate($perPage);
         if ($restaurants->count() == 0) {
