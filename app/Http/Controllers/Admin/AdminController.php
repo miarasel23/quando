@@ -393,19 +393,61 @@ class AdminController extends Controller
             'data' => $restaurant
         ], 200);
     }
+    // public function restaurant_search_list(Request $request){
+    // $perPage = $request->input('per_page', 10);
+    // $name = $request->input('name');
+    // $postCode = $request->input('post_code');
+    // $query = Restaurant::orderBy('id',
+    'desc')->with('category_list','aval_slots','label_tags','about_label_tags','photos','reviews',)->where('status',
+    'active')->select(['id','uuid','restaurant_id','name','address','phone','email','category','description','post_code','status','avatar','website','online_order']);
+    // if ($name) {
+    // $query->where('name', 'like', '%' . $name . '%');
+    // }
+    // if ($postCode) {
+    // $query->where('post_code', 'like', '%' . $postCode . '%');
+    // }
+    // $restaurants = $query->paginate($perPage);
+    // if ($restaurants->count() == 0) {
+    // return response()->json([
+    // 'status' => false,
+    // 'message' => 'Restaurant not found'
+    // ], 404);
+    // }
+    // return response()->json([
+    // 'status' => true,
+    // 'data' => $restaurants
+    // ], 200);
+    // }
+
     public function restaurant_search_list(Request $request){
         $perPage = $request->input('per_page', 10);
-        $name = $request->input('name');
-        $postCode = $request->input('post_code');
-        $query  = Restaurant::orderBy('id', 'desc')->with('category_list','aval_slots','label_tags','about_label_tags','photos','reviews',)->where('status', 'active')->select(['id','uuid','restaurant_id','name','address','phone','email','category','description','post_code','status','avatar','website','online_order']);
-        if ($name) {
-            $query->where('name', 'like', '%' . $name . '%');
+        $name = trim($request->input('name', ''));
+        $postCode = trim($request->input('post_code', ''));
+
+        // Start Query
+        $query = Restaurant::orderBy('id', 'desc')
+        ->with('category_list', 'aval_slots', 'label_tags', 'about_label_tags', 'photos', 'reviews')
+        ->where('status', 'active')
+        ->select([
+        'id', 'uuid', 'restaurant_id', 'name', 'address', 'phone',
+        'email', 'category', 'description', 'post_code', 'status',
+        'avatar', 'website', 'online_order'
+        ]);
+
+        // Apply Filters
+        if (!empty($name)) {
+        $query->where('name', 'LIKE', "%{$name}%");
         }
-        if ($postCode) {
-            $query->where('post_code', 'like', '%' . $postCode . '%');
+        if (!empty($postCode)) {
+        $query->where('post_code', 'LIKE', "%{$postCode}%");
         }
+    // Debugging (Optional)
+    // dd($query->toSql(), $query->getBindings());
+
+    // Fetch Data
         $restaurants = $query->paginate($perPage);
-        if ($restaurants->count() == 0) {
+    // Check if results exist
+    if ($restaurants->isEmpty()) {
             return response()->json([
                 'status' => false,
                 'message' => 'Restaurant not found'
